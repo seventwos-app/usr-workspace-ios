@@ -38,7 +38,11 @@ If after your research you still have a question, ask at [#element-x-ios:matrix.
 
 ## Forking
 
-Please read our [forking guide](docs/FORKING.md).
+Element X is a dual-licensed reference implementation. A fork is available under the AGPL-3.0 or an Element Commercial Licence; ensure your intended use complies with the applicable licence.
+
+For Seventwos products, treat Element X as an architectural reference rather than a codebase to fork. Build directly on the Apache-2.0 [Matrix Rust SDK](https://github.com/matrix-org/matrix-rust-sdk), retaining the native declarative UI and UniFFI integration pattern while keeping application code separately authored.
+
+If an Element X fork is the appropriate option, see the [forking guide](docs/FORKING.md) for project, runtime, authentication, and location-sharing setup.
 
 ## Copyright & License
 
