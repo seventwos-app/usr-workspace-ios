@@ -1,58 +1,66 @@
-[![Element iOS Matrix room #element-x-ios:matrix.org](https://img.shields.io/matrix/element-x-ios:matrix.org.svg?label=%23element-x-ios:matrix.org&logo=matrix&server_fqdn=matrix.org)](https://matrix.to/#/#element-x-ios:matrix.org)
-![GitHub](https://img.shields.io/github/license/element-hq/element-x-ios)
+# Seventwos Workspace for iOS
 
-![Build Status](https://img.shields.io/github/actions/workflow/status/element-hq/element-x-ios/unit-tests.yml)
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/element-hq/element-x-ios)
+Seventwos Workspace for iOS is the native mobile client for the Seventwos workspace. It is being built for people and agents to communicate and collaborate over [Matrix](https://matrix.org/).
 
-[![codecov](https://codecov.io/gh/element-hq/element-x-ios/branch/develop/graph/badge.svg?token=AVIJB2MJU2)](https://codecov.io/gh/element-hq/element-x-ios)
-
-# Element X iOS
-
-Element X iOS is the next-generation [Matrix](https://matrix.org/) client provided by [Element](https://element.io/).
-
-Compared to the previous-generation [Element Classic](https://github.com/element-hq/element-ios), it is a total rewrite using the [Matrix Rust SDK](https://github.com/matrix-org/matrix-rust-sdk) underneath and targeting devices running iOS 18+.
-
-## Rust SDK
-
-Element X leverages the [Matrix Rust SDK](https://github.com/matrix-org/matrix-rust-sdk) through an FFI layer exposed as a [swift package](https://github.com/matrix-org/matrix-rust-components-swift) that the final client can directly import and use. We're doing this as a way to share code between platforms, with [Element X Android](https://github.com/element-hq/element-x-android) using the same SDK.
+The target application uses SwiftUI over the [Matrix Rust SDK](https://github.com/matrix-org/matrix-rust-sdk), exposed to Swift through [UniFFI](https://mozilla.github.io/uniffi-rs/). The shared Rust core provides Matrix synchronisation, local state, and end-to-end encryption while the application remains native to iOS.
 
 ## Status
 
-This project is actively developed and supported. New users are recommended to use Element X instead of the previous-generation app.
+This repository is in transition and is not yet a separately authored Seventwos client.
 
-## Contributing
+It currently contains code derived from [Element X iOS](https://github.com/element-hq/element-x-ios), including Element branding and configuration. That inherited code remains subject to Element X's licence terms. Do not represent a build from the current repository as an independent Seventwos implementation.
 
-Please see our [contribution guide](CONTRIBUTING.md).
+The migration will replace the inherited application layer with separately authored Seventwos code while retaining the architectural pattern of a native SwiftUI client backed by the Apache-2.0 Matrix Rust SDK.
 
-Come chat with the community in the dedicated Matrix [room](https://matrix.to/#/#element-x-ios:matrix.org).
+## Architecture
 
-## Build instructions
+The intended iOS architecture includes:
 
-Please refer to the [setting up a development environment](CONTRIBUTING.md#setting-up-a-development-environment) section from the [contribution guide](CONTRIBUTING.md).
+- Swift 6 and SwiftUI.
+- Matrix Rust SDK integration through Swift Package Manager and UniFFI.
+- Client-side Matrix end-to-end encryption.
+- Secure credential storage in the Apple Keychain.
+- Background synchronisation.
+- An iOS Notification Service Extension for encrypted notifications.
 
-## Support
+Element X is an architectural reference, not the target application codebase.
 
-When you are experiencing an issue on Element X iOS, please first search in [GitHub issues](https://github.com/element-hq/element-x-ios/issues)
-and then in [#element-x-ios:matrix.org](https://matrix.to/#/#element-x-ios:matrix.org).
-If after your research you still have a question, ask at [#element-x-ios:matrix.org](https://matrix.to/#/#element-x-ios:matrix.org). Otherwise feel free to create a GitHub issue if you encounter a bug or a crash, by explaining clearly in detail what happened. You can also perform bug reporting (Rageshake) from the Element application by going to the application settings. This is especially recommended when you encounter a crash.
+## Development
 
-## Forking
+Development requires macOS, Homebrew, and the Xcode version selected by `ci_scripts/ci_common.sh`.
 
-Element X is a dual-licensed reference implementation. A fork is available under the AGPL-3.0 or an Element Commercial Licence; ensure your intended use complies with the applicable licence.
+After cloning the repository, run:
 
-For Seventwos products, treat Element X as an architectural reference rather than a codebase to fork. Build directly on the Apache-2.0 [Matrix Rust SDK](https://github.com/matrix-org/matrix-rust-sdk), retaining the native declarative UI and UniFFI integration pattern while keeping application code separately authored.
+```sh
+swift run tools setup-project
+```
 
-If an Element X fork is the appropriate option, see the [forking guide](docs/FORKING.md) for project, runtime, authentication, and location-sharing setup.
+The setup command installs the required tools, configures the repository's Git hooks, and generates the Xcode project.
 
-## Copyright & License
+The project uses [XcodeGen](https://github.com/yonaskolb/XcodeGen). Change `project.yml`, `app.yml`, or the relevant target configuration instead of editing `ElementX.xcodeproj` directly.
+
+Dependencies are resolved with Swift Package Manager. To use a locally built Matrix Rust SDK, run:
+
+```sh
+swift run tools build-sdk
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full development workflow.
+
+## Repository role
+
+The workspace captures intent and human direction. This repository captures implementation, review, and attribution.
+
+Changes should make the transition away from inherited application code explicit and auditable. New product code should follow the repository architecture and contribution rules in [AGENTS.md](AGENTS.md).
+
+## Provenance and licence
+
+The current codebase is derived from Element X iOS, which is dual-licensed under the GNU Affero General Public License v3 or a paid Element Commercial License.
 
 Copyright (c) 2025 - 2026 Element Creations Ltd.
+
 Copyright (c) 2022 - 2025 New Vector Ltd.
 
-This software is dual licensed by Element Creations Ltd (Element). It can be used either:
+See [LICENSE](LICENSE) and [LICENSE-COMMERCIAL](LICENSE-COMMERCIAL) for the terms that apply to inherited code.
 
-(1) for free under the terms of the GNU Affero General Public License (as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version); OR
-
-(2) under the terms of a paid-for Element Commercial License agreement between you and Element (the terms of which may vary depending on what you and Element have agreed to). 
-
-Unless required by applicable law or agreed to in writing, software distributed under the Licenses is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the Licenses for the specific language governing permissions and limitations under the Licenses.
+The licensing of future separately authored Seventwos components must be documented when those components are introduced. Their inclusion does not alter the licence obligations of inherited Element X code.
