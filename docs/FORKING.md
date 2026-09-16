@@ -33,7 +33,9 @@ Never commit the generated values. Release automation must restore the checked-i
 
 ## Release preparation
 
-Repository automation does not publish an App Store build or dispatch to Element infrastructure. Calendar version updates and release-readiness checks are manual workflows. The GitHub release command targets `GITHUB_REPOSITORY` and pushes only its current branch; it does not merge or rebase `main`.
+Repository automation does not publish an App Store build or dispatch to Element infrastructure. Calendar version updates are manual. The GitHub release command has an explicit repository-owned target of `seventwos-app/usr-workspace-ios`, suitable for its Xcode Cloud caller, and pushes only its current branch; it does not merge or rebase `main`.
+
+Both the manual **Release Readiness** workflow and the Xcode Cloud `release-to-github` command run `ci_scripts/validate_release_readiness.sh`. The release command runs this check before making any GitHub API request, so publishing fails closed if identifiers, required URLs, signing configuration, or inherited service configuration are unsafe.
 
 Before creating a production archive:
 

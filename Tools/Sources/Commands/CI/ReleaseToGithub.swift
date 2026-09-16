@@ -3,6 +3,8 @@ import Foundation
 import Yams
 
 struct ReleaseToGitHub: AsyncParsableCommand {
+    private static let repository = "seventwos-app/usr-workspace-ios"
+
     static let configuration = CommandConfiguration(commandName: "release-to-github",
                                                     abstract: "Creates a GitHub release and updates CHANGES.md with generated release notes.")
     
@@ -12,7 +14,6 @@ struct ReleaseToGitHub: AsyncParsableCommand {
         case failedToParseResponse
         case missingReleaseNotes
         case failedToReadVersion
-        case missingGitHubRepository
         
         var errorDescription: String? {
             switch self {
@@ -26,13 +27,14 @@ struct ReleaseToGitHub: AsyncParsableCommand {
                 return "The generated release notes are empty."
             case .failedToReadVersion:
                 return "Failed to read the marketing version from project.yml."
-            case .missingGitHubRepository:
-                return "The GITHUB_REPOSITORY environment variable is not set to an owner/repository value."
             }
         }
     }
     
     func run() async throws {
+        let readinessScript = URL.projectDirectory.appending(path: "ci_scripts/validate_release_readiness.sh").path
+        try await CI.run(.path("/bin/sh"), [readinessScript, URL.projectDirectory.path])
+
         let currentVersion = try CI.readMarketingVersion()
         logger.info("Creating GitHub release for version \(currentVersion)…")
         
@@ -74,11 +76,7 @@ struct ReleaseToGitHub: AsyncParsableCommand {
             throw ReleaseError.missingGitHubToken
         }
         
-        guard let repository = ProcessInfo.processInfo.environment["GITHUB_REPOSITORY"],
-              repository.range(of: #"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"#, options: .regularExpression) != nil,
-              let url = URL(string: "https://api.github.com/repos/\(repository)/releases") else {
-            throw ReleaseError.missingGitHubRepository
-        }
+        let url = URL(string: "https://api.github.com/repos/\(Self.repository)/releases")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("Bearer \(apiToken)", forHTTPHeaderField: "Authorization")
