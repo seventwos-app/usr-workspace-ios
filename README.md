@@ -31,14 +31,14 @@ Changes should make the transition from inherited application code explicit and 
 
 ## Provenance and licence
 
-The current codebase is derived from Element X iOS. Seventwos distributes this fork under the GNU Affero General Public License v3 only.
+This repository began as a fork of Element X iOS and is now maintained as Seventwos Workspace for iOS.
 
 Copyright (c) 2025 Element Creations Ltd.
 
 Copyright (c) 2022 - 2025 New Vector Ltd.
 
-See [LICENSE](LICENSE) for the terms that apply to the repository-owned code. Third-party dependencies remain under their respective licences.
+These upstream copyright notices are retained in recognition of the work on which this fork is based.
 
-Seventwos relies on the AGPL-3.0-only licensing option for this fork's use and distribution. When Seventwos modifies and distributes the software, or makes a modified version available for users to interact with over a network, the corresponding source must be offered as required by the AGPL.
+We license the repository-owned code under the GNU Affero General Public License v3 only. See [LICENSE](LICENSE) for the applicable terms. Third-party dependencies remain under their respective licences.
 
-Future separately authored Seventwos components added to this repository must use AGPL-3.0-only unless they are clearly identified third-party dependencies under compatible terms.
+Our modifications and newly authored repository code use AGPL-3.0-only. When we distribute a modified version or make one available for users to interact with over a network, we provide the corresponding source as required by the AGPL.
