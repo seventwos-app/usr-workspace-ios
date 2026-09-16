@@ -7,7 +7,7 @@
 //
 
 import Combine
-@testable import ElementX
+@testable import Seventwos
 import MatrixRustSDK
 import Testing
 
@@ -455,7 +455,7 @@ final class SecurityAndPrivacyScreenViewModelTests {
     
     private func setupViewModel(joinedParentSpaces: [SpaceServiceRoom],
                                 topLevelSpaces: [SpaceServiceRoom] = [],
-                                joinRule: ElementX.JoinRule,
+                                joinRule: Seventwos.JoinRule,
                                 forceDisableE2EE: Bool = false) {
         let appSettings = AppSettings.volatile()
         appSettings.knockingEnabled = true

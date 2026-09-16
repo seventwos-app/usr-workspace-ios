@@ -1,0 +1,6 @@
+"NSCameraUsageDescription" = "Chcete-li pořizovat snímky nebo videa a odesílat je jako zprávu, potřebuje Seventwos Workspace přístup k fotoaparátu.";
+"NSFaceIDUsageDescription" = "K přístupu do aplikace se používá Face ID.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "Aby mohla aplikace Seventwos Workspace sdílet vaši aktuální polohu, potřebuje přístup k poloze, i když je aplikace spuštěna na pozadí.";
+"NSLocationWhenInUseUsageDescription" = "Udělte přístup k poloze, aby mohl Seventwos Workspace sdílet vaši polohu.";
+"NSMicrophoneUsageDescription" = "Aby bylo možné nahrávat a odesílat zprávy se zvukem, potřebuje Seventwos Workspace přístup k mikrofonu.";
+"NSPhotoLibraryUsageDescription" = "To vám umožní ukládat obrázky a videa do knihovny fotografií.";

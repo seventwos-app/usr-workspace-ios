@@ -7,7 +7,7 @@
 //
 
 import AnalyticsEvents
-@testable import ElementX
+@testable import Seventwos
 import PostHog
 import Testing
 

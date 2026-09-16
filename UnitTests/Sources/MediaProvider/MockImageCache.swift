@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only.
 // Please see LICENSE files in the repository root for full details.
 //
-@testable import ElementX
+@testable import Seventwos
 @testable import Kingfisher
 import UIKit
 

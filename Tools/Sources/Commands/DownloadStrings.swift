@@ -20,7 +20,7 @@ struct DownloadStrings: ParsableCommand {
     }
     
     private func sortStringsFiles() throws {
-        let localizationsURL = URL(fileURLWithPath: "ElementX/Resources/Localizations")
+        let localizationsURL = URL(fileURLWithPath: "Seventwos/Resources/Localizations")
         let fileManager = FileManager.default
         
         guard let enumerator = fileManager.enumerator(at: localizationsURL,

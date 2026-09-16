@@ -7,7 +7,7 @@
 //
 
 import AVKit
-@testable import ElementX
+@testable import Seventwos
 import Testing
 
 struct AVMetadataMachineReadableCodeObjectExtensionsTest {

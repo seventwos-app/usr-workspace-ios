@@ -1,0 +1,6 @@
+"NSCameraUsageDescription" = "Para tirar fotografias ou vídeos e enviá-los como mensagens, o Seventwos Workspace precisa de acesso à câmara.";
+"NSFaceIDUsageDescription" = "O Face ID é utilizado para aceder à aplicação.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "To share your location live in chats, location access is needed when the app is in the background.";
+"NSLocationWhenInUseUsageDescription" = "Conceder permissão à localização para que a Seventwos Workspace possa partilhar a tua localização.";
+"NSMicrophoneUsageDescription" = "Para gravar e enviar mensagens com áudio, a Seventwos Workspace precisa de aceder ao microfone.";
+"NSPhotoLibraryUsageDescription" = "Permite-te guardar fotografias e vídeos na tua biblioteca.";

@@ -16,7 +16,7 @@ struct UnusedStrings: ParsableCommand {
         print("Analysing project, this may take a while…")
         
         // Uses the existing .periphery.yml with small tweaks to the output.
-        let command = "periphery scan --quiet --relative-results --report-include ElementX/Sources/Generated/Strings.swift"
+        let command = "periphery scan --quiet --relative-results --report-include Seventwos/Sources/Generated/Strings.swift"
         let output = try Zsh.run(command: command)
         
         guard let output else {

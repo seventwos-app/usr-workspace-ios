@@ -6,7 +6,7 @@
 //
 
 import CallKit
-@testable import ElementX
+@testable import Seventwos
 import PushKit
 import Testing
 

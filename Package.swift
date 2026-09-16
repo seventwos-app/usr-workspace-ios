@@ -19,7 +19,7 @@ if FileManager.default.fileExists(atPath: "Enterprise/Pipeline/Package.swift") {
 }
 
 let package = Package(
-    name: "Element Swift",
+    name: "Seventwos Swift",
     platforms: [
         .macOS(.v15)
     ],

@@ -8,8 +8,8 @@ export PATH="$PATH:/opt/homebrew/bin"
 # ignores updates of 'Secrets.swift' to avoid pushing sensitive data by mistake
 git update-index --assume-unchanged Components/Secrets/Secrets.swift
 
-LOCAL_SCRIPT_PATH="$HOME/.local/elementx_local_dev/post-checkout"
+LOCAL_SCRIPT_PATH="$HOME/.local/seventwos_local_dev/post-checkout"
 if [ -x "$LOCAL_SCRIPT_PATH" ]; then
-	export ELEMENTX_REPO="$(pwd)"
+	export SEVENTWOS_REPO="$(pwd)"
 	"$LOCAL_SCRIPT_PATH"
 fi

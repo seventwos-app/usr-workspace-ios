@@ -68,3 +68,26 @@ fetch_unshallow_repository() {
     # Xcode Cloud shallow clones the repo. We need to deepen it to fetch tags, commit history and be able to rebase main on develop at the end of releases.
     git fetch --unshallow --quiet
 }
+
+upload_dsyms_if_configured() {
+    # Seventwos does not (yet) have its own Sentry organization/project provisioned.
+    # UploadDSYMs requires SENTRY_ORG_SLUG, SENTRY_PROJECT_SLUG and SENTRY_URL to be
+    # supplied explicitly and never falls back to Element's Sentry endpoints, so this
+    # step is opt-in and only runs when a complete Seventwos-owned configuration is
+    # present via CI environment variables (SENTRY_AUTH_TOKEN is validated separately
+    # by the tool itself).
+    if [ -n "${SENTRY_ORG_SLUG:-}" ] && [ -n "${SENTRY_PROJECT_SLUG:-}" ] && [ -n "${SENTRY_URL:-}" ] && [ -n "${SENTRY_AUTH_TOKEN:-}" ]; then
+        swift run -q tools ci upload-dsyms \
+            --dsym-path "$CI_ARCHIVE_PATH/dSYMs" \
+            --org-slug "$SENTRY_ORG_SLUG" \
+            --project-slug "$SENTRY_PROJECT_SLUG" \
+            --url "$SENTRY_URL"
+    elif [ "$CI_WORKFLOW" = "Release" ]; then
+        # Release builds must fail closed rather than silently ship without crash
+        # symbolication once Sentry is expected to be configured.
+        echo "upload_dsyms_if_configured: SENTRY_ORG_SLUG, SENTRY_PROJECT_SLUG, SENTRY_URL and SENTRY_AUTH_TOKEN must all be set to upload dSYMs for a Release build." >&2
+        return 1
+    else
+        echo "upload_dsyms_if_configured: skipping dSYM upload — Seventwos Sentry is not configured for this workflow (Element's Sentry endpoints are never used as a fallback)."
+    fi
+}

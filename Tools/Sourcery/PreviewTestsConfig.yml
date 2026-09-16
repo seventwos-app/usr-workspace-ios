@@ -1,6 +1,6 @@
 sources:
   include:
-    - ../../ElementX
+    - ../../Seventwos
 templates:
   - PreviewTests.stencil
 output:

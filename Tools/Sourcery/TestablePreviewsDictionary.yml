@@ -1,7 +1,7 @@
 sources:
   include:
-    - ../../ElementX
+    - ../../Seventwos
 templates:
   - TestablePreviewsDictionary.stencil
 output:
-  ../../ElementX/Sources/Other/TestablePreview/TestablePreviewsDictionary.swift
+  ../../Seventwos/Sources/Other/TestablePreview/TestablePreviewsDictionary.swift

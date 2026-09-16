@@ -105,7 +105,7 @@ class AuthenticationFlowCoordinatorUITests: XCTestCase {
         app.textFields[A11yIdentifiers.changeServerScreen.server].clearAndTypeText("company.com\n", app: app)
         
         let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
-        let wasAlertText = springboard.staticTexts["“ElementX” Wants to Use “company.com” to Sign In"]
+        let wasAlertText = springboard.staticTexts["“Seventwos Workspace” Wants to Use “company.com” to Sign In"]
         
         // On a fresh simulator the webcredentials association is sometimes slow to be resolved.
         // This results in an error alert being shown instead of the Web Authentication Session alert.

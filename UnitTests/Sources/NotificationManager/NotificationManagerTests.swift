@@ -7,7 +7,7 @@
 //
 
 import Combine
-@testable import ElementX
+@testable import Seventwos
 import NotificationCenter
 import Testing
 
@@ -288,7 +288,7 @@ extension NotificationManagerTests: @MainActor NotificationManagerDelegate {
         notificationTappedDelegateCalled = true
     }
     
-    func handleInlineReply(_ service: ElementX.NotificationManagerProtocol, content: UNNotificationContent, replyText: String) async {
+    func handleInlineReply(_ service: Seventwos.NotificationManagerProtocol, content: UNNotificationContent, replyText: String) async {
         handleInlineReplyDelegateCalled = true
     }
 }

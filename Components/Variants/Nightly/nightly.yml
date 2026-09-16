@@ -4,7 +4,7 @@ settings:
   IS_NIGHTLY_BUILD: true
 
 targets:
-  ElementX:
+  Seventwos:
     settings:
       base:
         ASSETCATALOG_COMPILER_APPICON_NAME: NightlyAppIcon

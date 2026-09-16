@@ -1,0 +1,6 @@
+"NSCameraUsageDescription" = "Seventwos Workspace treba pristup kameri kako biste mogli fotografirati i snimati videozapise te ih slati kao poruke.";
+"NSFaceIDUsageDescription" = "Face ID se koristi za zaštitu pristupa vašem računu.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "Za dijeljenje vaše lokacije uživo, Seventwos Workspace treba pristup lokaciji kada je aplikacija u pozadini.";
+"NSLocationWhenInUseUsageDescription" = "Omogućite pristup lokaciji kako bi Seventwos Workspace mogao dijeliti vašu lokaciju.";
+"NSMicrophoneUsageDescription" = "Seventwos Workspace treba pristup mikrofonu kako biste mogli snimati i slati poruke sa zvukom.";
+"NSPhotoLibraryUsageDescription" = "To vam omogućuje spremanje slika i videozapisa u fotogaleriju.";

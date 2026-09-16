@@ -7,7 +7,7 @@
 //
 
 import Combine
-@testable import ElementX
+@testable import Seventwos
 import Kingfisher
 import SwiftUI
 import Testing

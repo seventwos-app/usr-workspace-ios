@@ -26,7 +26,7 @@ targets:
     platform: iOS
 
     dependencies:
-    - target: ElementX
+    - target: Seventwos
     - package: MatrixRustSDK
     - package: AnalyticsEvents
     - package: DeviceKit
@@ -63,8 +63,8 @@ targets:
       excludes:
         - "**/__Snapshots__/**"
     - path: ../SupportingFiles
-    - path: ../../ElementX/Sources/Other/AccessibilityIdentifiers.swift
-    - path: ../../ElementX/Sources/Other/Extensions/Bundle.swift
-    - path: ../../ElementX/Sources/Other/Extensions/XCUIElement.swift
-    - path: ../../ElementX/Sources/UITests/UITestsScreenIdentifier.swift
-    - path: ../../ElementX/Sources/UITests/UITestsSignalling.swift
+    - path: ../../Seventwos/Sources/Other/AccessibilityIdentifiers.swift
+    - path: ../../Seventwos/Sources/Other/Extensions/Bundle.swift
+    - path: ../../Seventwos/Sources/Other/Extensions/XCUIElement.swift
+    - path: ../../Seventwos/Sources/UITests/UITestsScreenIdentifier.swift
+    - path: ../../Seventwos/Sources/UITests/UITestsSignalling.swift

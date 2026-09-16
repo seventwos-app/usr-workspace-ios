@@ -9,14 +9,14 @@ struct UploadDSYMs: AsyncParsableCommand {
     @Option(help: "The path to the dSYMs directory or file to upload.")
     var dsymPath: String
     
-    @Option(help: "The Sentry organization slug.")
-    var orgSlug = "element"
+    @Option(help: "The Sentry organization slug. Must be configured explicitly; there is no inherited default.")
+    var orgSlug: String
     
-    @Option(help: "The Sentry project slug.")
-    var projectSlug = "element-x-ios"
+    @Option(help: "The Sentry project slug. Must be configured explicitly; there is no inherited default.")
+    var projectSlug: String
     
-    @Option(help: "The Sentry server URL.")
-    var url = "https://sentry.tools.element.io/"
+    @Option(help: "The Sentry server URL. Must be configured explicitly; there is no inherited default.")
+    var url: String
     
     @Option(help: "The maximum number of upload attempts.")
     var maxRetries = 5

@@ -11,8 +11,8 @@ fi
 
 ./Tools/Scripts/validate_lfs.sh
 
-LOCAL_SCRIPT_PATH="$HOME/.local/elementx_local_dev/pre-commit"
+LOCAL_SCRIPT_PATH="$HOME/.local/seventwos_local_dev/pre-commit"
 if [ -x "$LOCAL_SCRIPT_PATH" ]; then
-	export ELEMENTX_REPO="$(pwd)"
+	export SEVENTWOS_REPO="$(pwd)"
 	"$LOCAL_SCRIPT_PATH"
 fi

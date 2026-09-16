@@ -1,0 +1,6 @@
+"NSCameraUsageDescription" = "Fotoğraf veya video çekmek ve bunları mesaj olarak göndermek için Seventwos Workspace'in kameraya erişimi gerekir.";
+"NSFaceIDUsageDescription" = "Face ID, uygulamanıza erişmek için kullanılır.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "To share your location live in chats, location access is needed when the app is in the background.";
+"NSLocationWhenInUseUsageDescription" = "Seventwos Workspace'in konumunuzu paylaşabilmesi için konum erişimi verin.";
+"NSMicrophoneUsageDescription" = "Sesli mesaj kaydetmek ve göndermek için Seventwos Workspace'in mikrofona erişmesi gerekir.";
+"NSPhotoLibraryUsageDescription" = "Bu, görüntüleri ve videoları fotoğraf kitaplığınıza kaydetmenizi sağlar.";

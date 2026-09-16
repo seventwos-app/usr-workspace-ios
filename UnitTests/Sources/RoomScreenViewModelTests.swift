@@ -7,7 +7,7 @@
 //
 
 import Combine
-@testable import ElementX
+@testable import Seventwos
 import Foundation
 import MatrixRustSDK
 import MatrixRustSDKMocks

@@ -9,7 +9,7 @@ if [ ! $# -eq 1 ]; then
     exit 1
 fi
 
-SCREENS_DIR="../../ElementX/Sources/Screens"/$1Screen
+SCREENS_DIR="../../Seventwos/Sources/Screens"/$1Screen
 UNIT_TESTS_DIR="../../UnitTests/Sources"
 
 if [ -e $SCREENS_DIR ]; then
@@ -23,7 +23,7 @@ mkdir -p $SCREENS_DIR
 
 echo "Copying screen files"
 
-cp -R "Templates/SimpleScreenExample/ElementX/" $SCREENS_DIR/
+cp -R "Templates/SimpleScreenExample/Seventwos/" $SCREENS_DIR/
 
 echo "Copying tests"
 

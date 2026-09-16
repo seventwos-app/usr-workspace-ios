@@ -1,5 +1,5 @@
 ---
-name: ElementX
+name: Seventwos
 attributes:
   ORGANIZATIONNAME: Seventwos
   LastUpgradeCheck: "1620"
@@ -16,7 +16,7 @@ options:
     macOS: '14.5'
   groupOrdering:
   - order:
-    - ElementX
+    - Seventwos
     - NSE
     - ShareExtension
     - UnitTests
@@ -26,7 +26,7 @@ options:
     - IntegrationTests
     - Components
     - Tools
-  - pattern: ElementX
+  - pattern: Seventwos
     order:
     - Sources
     - Resources
@@ -57,7 +57,7 @@ settings:
 
 include:
 - path: app.yml
-- path: ElementX/SupportingFiles/target.yml
+- path: Seventwos/SupportingFiles/target.yml
 - path: NSE/SupportingFiles/target.yml
 - path: ShareExtension/SupportingFiles/target.yml
 - path: UnitTests/SupportingFiles/target.yml

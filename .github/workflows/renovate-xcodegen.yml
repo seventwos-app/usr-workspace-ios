@@ -45,17 +45,17 @@ jobs:
         run: xcodegen
 
       - name: Resolve dependencies and build the project
-        run: xcodebuild -scheme ElementX -project ElementX.xcodeproj -destination 'generic/platform=iOS Simulator' build
+        run: xcodebuild -scheme Seventwos -project Seventwos.xcodeproj -destination 'generic/platform=iOS Simulator' build
 
       - name: Update Acknowledgements
-        run: swift-package-list ElementX.xcodeproj --requires-license --ignore-package compound-ios --ignore-package compound-design-tokens --ignore-package matrix-rich-text-editor-swift --ignore-package element-call-swift --output-type settings-bundle --output-path ElementX/SupportingFiles
+        run: swift-package-list Seventwos.xcodeproj --requires-license --ignore-package compound-ios --ignore-package compound-design-tokens --ignore-package matrix-rich-text-editor-swift --ignore-package element-call-swift --output-type settings-bundle --output-path Seventwos/SupportingFiles
 
       - name: Commit and push changes
         run: |
           git config user.name "GitHub Actions"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ElementX.xcodeproj/project.pbxproj
-          git add ElementX.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
-          git add ElementX/SupportingFiles/Settings.bundle
+          git add Seventwos.xcodeproj/project.pbxproj
+          git add Seventwos.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+          git add Seventwos/SupportingFiles/Settings.bundle
           git diff --staged --quiet || git commit -m "Run XcodeGen, update Package.resolved and Settings.bundle"
           git push

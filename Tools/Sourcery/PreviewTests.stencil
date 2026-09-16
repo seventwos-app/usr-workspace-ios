@@ -2,7 +2,7 @@
 // swiftformat:disable all
 
 import Testing
-@testable import ElementX
+@testable import Seventwos
 {% if argument.mainTarget %}
 @testable import {{ argument.mainTarget }}
 {% endif %}
