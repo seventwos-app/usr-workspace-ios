@@ -1,0 +1,14 @@
+* @seventwos-app/engineering
+
+# Security policy, automation, signing, and entitlements require Security review.
+/SECURITY.md @seventwos-app/engineering @seventwos-app/security
+/.github/ @seventwos-app/engineering @seventwos-app/security
+/app.yml @seventwos-app/engineering @seventwos-app/security
+/ci_scripts/validate_release_readiness.sh @seventwos-app/engineering @seventwos-app/security
+**/*.entitlements @seventwos-app/engineering @seventwos-app/security
+/Seventwos/Sources/Services/Authentication/ @seventwos-app/engineering @seventwos-app/security
+/Seventwos/Sources/Services/Keychain/ @seventwos-app/engineering @seventwos-app/security
+/Seventwos/Sources/Services/SecureBackup/ @seventwos-app/engineering @seventwos-app/security
+/Seventwos/Sources/Services/SessionVerification/ @seventwos-app/engineering @seventwos-app/security
+/Seventwos/Sources/Screens/Authentication/ @seventwos-app/engineering @seventwos-app/security
+/Seventwos/Sources/Screens/SecureBackup/ @seventwos-app/engineering @seventwos-app/security
