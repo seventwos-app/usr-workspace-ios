@@ -123,7 +123,7 @@ Once the strings have been added to Localazy, they can be downloaded by running 
 
 ### Continuous Integration
 
-Element X uses a suite of Swift command line tools for running actions on the CI and tries to keep the configuration confined to [Tools/Sources](Tools/Sources) alongside the project's [xcodegen](project.yml) configuration.
+This project uses a suite of Swift command line tools for running actions on the CI and tries to keep the configuration confined to [Tools/Sources](Tools/Sources) alongside the project's [xcodegen](project.yml) configuration.
 
 Please run `swift run tools ci --help` to see available options.
 
