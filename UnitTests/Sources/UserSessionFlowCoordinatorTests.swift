@@ -7,7 +7,7 @@
 //
 
 import Combine
-@testable import ElementX
+@testable import Seventwos
 import Foundation
 import Testing
 
@@ -303,7 +303,7 @@ struct UserSessionFlowCoordinatorTests {
     private var retractReachabilityIndicatorCallsCount: Int {
         userIndicatorController
             .retractIndicatorWithIdReceivedInvocations
-            .filter { $0 == "io.element.elementx.reachability.notification" }
+            .filter { $0 == "org.seventwos.workspace.reachability.notification" }
             .count
     }
 }

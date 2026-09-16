@@ -7,7 +7,7 @@
 //
 
 import Combine
-@testable import ElementX
+@testable import Seventwos
 import MatrixRustSDK
 import QuickLook
 import SwiftUI

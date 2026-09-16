@@ -23,7 +23,7 @@
     {
       "parallelizable" : false,
       "target" : {
-        "containerPath" : "container:ElementX.xcodeproj",
+        "containerPath" : "container:Seventwos.xcodeproj",
         "identifier" : "32C23C8D224D46EFE62AFAD0",
         "name" : "UnitTests"
       }

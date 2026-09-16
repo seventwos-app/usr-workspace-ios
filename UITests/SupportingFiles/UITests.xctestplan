@@ -13,9 +13,9 @@
     "codeCoverage" : {
       "targets" : [
         {
-          "containerPath" : "container:ElementX.xcodeproj",
+          "containerPath" : "container:Seventwos.xcodeproj",
           "identifier" : "C0FAEB81CFD9776CD78CE489",
-          "name" : "ElementX"
+          "name" : "Seventwos"
         }
       ]
     },
@@ -36,7 +36,7 @@
       "referenceType" : "built-in"
     },
     "targetForVariableExpansion" : {
-      "containerPath" : "container:ElementX.xcodeproj",
+      "containerPath" : "container:Seventwos.xcodeproj",
       "identifier" : "0E28CD62691FDBC63147D5E3",
       "name" : "UITests"
     },
@@ -45,7 +45,7 @@
   "testTargets" : [
     {
       "target" : {
-        "containerPath" : "container:ElementX.xcodeproj",
+        "containerPath" : "container:Seventwos.xcodeproj",
         "identifier" : "0E28CD62691FDBC63147D5E3",
         "name" : "UITests"
       }

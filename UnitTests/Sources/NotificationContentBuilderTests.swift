@@ -6,7 +6,7 @@
 //
 
 import Dynamic
-@testable import ElementX
+@testable import Seventwos
 import MatrixRustSDK
 import MatrixRustSDKMocks
 import Testing

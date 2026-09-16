@@ -93,7 +93,7 @@ custom_rules:
   prefer_element_navigation_stack:
     regex: "\\b(NavigationStack)\\b"
     match_kinds: identifier
-    message: "Use ElementNavigationStack instead of NavigationStack"
+    message: "Use SeventwosNavigationStack instead of NavigationStack"
     severity: error
-    included: "ElementX/Sources/.*\\.swift"
-    excluded: "ElementNavigationStack.swift"
+    included: "Seventwos/Sources/.*\\.swift"
+    excluded: "SeventwosNavigationStack.swift"

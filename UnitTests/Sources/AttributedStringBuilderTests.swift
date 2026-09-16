@@ -6,7 +6,7 @@
 // Please see LICENSE files in the repository root for full details.
 //
 
-@testable import ElementX
+@testable import Seventwos
 import SwiftUI
 import Testing
 
@@ -277,7 +277,7 @@ struct AttributedStringBuilderTests {
         
         #expect(attributedString.formattedComponents.count == 2)
         
-        for run in attributedString.runs where run.elementX.blockquote ?? false {
+        for run in attributedString.runs where run.seventwos.blockquote ?? false {
             return
         }
         
@@ -301,7 +301,7 @@ struct AttributedStringBuilderTests {
         
         #expect(attributedString.formattedComponents.count == 3)
         
-        for run in attributedString.runs where run.elementX.blockquote ?? false {
+        for run in attributedString.runs where run.seventwos.blockquote ?? false {
             return
         }
         
@@ -325,7 +325,7 @@ struct AttributedStringBuilderTests {
         #expect(coalescedComponents.first?.attributedString.runs.count == 3, "Link not present in the component")
         
         var foundBlockquoteAndLink = false
-        for run in attributedString.runs where run.elementX.blockquote ?? false && run.link != nil {
+        for run in attributedString.runs where run.seventwos.blockquote ?? false && run.link != nil {
             foundBlockquoteAndLink = true
         }
         
@@ -354,7 +354,7 @@ struct AttributedStringBuilderTests {
         #expect(attributedString.formattedComponents.count == 5)
         
         var numberOfBlockquotes = 0
-        for run in attributedString.runs where run.elementX.blockquote ?? false && run.link != nil {
+        for run in attributedString.runs where run.seventwos.blockquote ?? false && run.link != nil {
             numberOfBlockquotes += 1
         }
         
@@ -371,7 +371,7 @@ struct AttributedStringBuilderTests {
         #expect(coalescedComponents.count == 5)
         
         var numberOfBlockquotes = 0
-        for run in attributedString.runs where run.elementX.blockquote ?? false {
+        for run in attributedString.runs where run.seventwos.blockquote ?? false {
             numberOfBlockquotes += 1
         }
         

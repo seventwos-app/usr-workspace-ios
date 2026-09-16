@@ -6,7 +6,7 @@ let logger = Logger(label: "🚀")
 
 @main
 struct Tools: AsyncParsableCommand {
-    static let configuration = CommandConfiguration(abstract: "A collection of command line tools for ElementX",
+    static let configuration = CommandConfiguration(abstract: "A collection of command line tools for Seventwos",
                                                     subcommands: [BuildSDK.self,
                                                                   SetupProject.self,
                                                                   OutdatedPackages.self,

@@ -8,7 +8,7 @@
 
 import Combine
 import CoreLocation
-@testable import ElementX
+@testable import Seventwos
 import Testing
 
 @MainActor

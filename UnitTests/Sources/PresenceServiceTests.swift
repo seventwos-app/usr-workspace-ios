@@ -6,7 +6,7 @@
 //
 
 import Combine
-@testable import ElementX
+@testable import Seventwos
 import Foundation
 import Testing
 import UIKit

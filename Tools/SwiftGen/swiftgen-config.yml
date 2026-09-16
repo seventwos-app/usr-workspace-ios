@@ -1,5 +1,5 @@
-input_dir: ../../ElementX/
-output_dir: ../../ElementX/Sources/Generated/
+input_dir: ../../Seventwos/
+output_dir: ../../Seventwos/Sources/Generated/
 xcassets:
   inputs:
     - Resources/Assets.xcassets
@@ -10,7 +10,7 @@ strings:
   - inputs: Resources/Localizations/en.lproj
     filter: Localizable*
     outputs:
-      templatePath: Templates/Strings/structured-swift5-element.stencil
+      templatePath: Templates/Strings/structured-swift5-seventwos.stencil
       output: Strings.swift
       params:
         enumName: L10n
@@ -19,7 +19,7 @@ strings:
   - inputs: Resources/Localizations/en.lproj
     filter: Untranslated*
     outputs:
-      templatePath: Templates/Strings/structured-swift5-element-untranslated.stencil
+      templatePath: Templates/Strings/structured-swift5-seventwos-untranslated.stencil
       output: Strings+Untranslated.swift
       params:
         enumName: UntranslatedL10n

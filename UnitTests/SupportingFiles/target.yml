@@ -19,7 +19,7 @@ schemes:
       disableMainThreadChecker: false
       gatherCoverageData: true
       coverageTargets:
-        - ElementX
+        - Seventwos
       testPlans:
         - path: UnitTests.xctestplan
           defaultPlan: true
@@ -30,7 +30,7 @@ targets:
     platform: iOS
 
     dependencies:
-    - target: ElementX
+    - target: Seventwos
     - target: MapLibreInterface
     - package: MatrixRustSDK
     - package: AsyncAlgorithms
@@ -59,7 +59,7 @@ targets:
     - path: ../../Components/DevelopmentAssets/Media
     - path: ../../Components/DevelopmentAssets/ClassicAppFixtures
       buildPhase: resources # Necessary to add binary files to the target.
-    - path: ../../ElementX/Sources/Other/Extensions/Publisher.swift
-    - path: ../../ElementX/Sources/Other/InfoPlistReader.swift
+    - path: ../../Seventwos/Sources/Other/Extensions/Publisher.swift
+    - path: ../../Seventwos/Sources/Other/InfoPlistReader.swift
     - path: ../../Tools/Scripts/Templates/SimpleScreenExample/Tests/Unit
     

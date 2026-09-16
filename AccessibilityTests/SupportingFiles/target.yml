@@ -26,7 +26,7 @@ targets:
     platform: iOS
 
     dependencies:
-    - target: ElementX
+    - target: Seventwos
     - package: KZFileWatchers
 
     info:
@@ -49,9 +49,9 @@ targets:
     sources:
     - path: ../Sources
     - path: ../SupportingFiles
-    - path: ../../ElementX/Sources/UITests/UITestsSignalling.swift
-    - path: ../../ElementX/Sources/Other/AccessibilityIdentifiers.swift
-    - path: ../../ElementX/Sources/Other/MatrixEntityRegex.swift
-    - path: ../../ElementX/Sources/Other/Pills/PillUtilities.swift
-    - path: ../../ElementX/Sources/Other/Extensions/NSRegularExpresion.swift
+    - path: ../../Seventwos/Sources/UITests/UITestsSignalling.swift
+    - path: ../../Seventwos/Sources/Other/AccessibilityIdentifiers.swift
+    - path: ../../Seventwos/Sources/Other/MatrixEntityRegex.swift
+    - path: ../../Seventwos/Sources/Other/Pills/PillUtilities.swift
+    - path: ../../Seventwos/Sources/Other/Extensions/NSRegularExpresion.swift
 

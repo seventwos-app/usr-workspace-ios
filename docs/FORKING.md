@@ -21,7 +21,7 @@ The production application domain is `workspace.seventwos.org`. The checked-in a
 
 ## Runtime configuration
 
-[AppSettings.swift](../ElementX/Sources/Application/Settings/AppSettings.swift) contains runtime service configuration. Required legal, policy, logo, and help URLs use `example.invalid` placeholders so the app cannot silently send users to inherited Element services or claim that unprovisioned Seventwos URLs exist. Replace every placeholder with an approved, live Seventwos URL before release; the manual **Release Readiness** workflow fails while any remain.
+[AppSettings.swift](../Seventwos/Sources/Application/Settings/AppSettings.swift) contains runtime service configuration. Required legal, policy, logo, and help URLs use `example.invalid` placeholders so the app cannot silently send users to inherited Element services or claim that unprovisioned Seventwos URLs exist. Replace every placeholder with an approved, live Seventwos URL before release; the manual **Release Readiness** workflow fails while any remain.
 
 Analytics, Sentry, rageshake diagnostics, call analytics, and MapLibre are disabled in the checked-in `Components/Secrets/Secrets.swift`. To enable a Seventwos-owned deployment, inject the corresponding environment variables into trusted build automation and regenerate the file with:
 

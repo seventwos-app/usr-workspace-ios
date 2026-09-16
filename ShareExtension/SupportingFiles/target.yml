@@ -84,27 +84,27 @@ targets:
     sources:
     - path: ../Sources
     - path: ../SupportingFiles
-    - path: ../../ElementX/Sources/ShareExtension
-    - path: ../../ElementX/Sources/AppHooks/AppHooks.swift
-    - path: ../../ElementX/Sources/AppHooks/Hooks/TracingHook.swift
-    - path: ../../ElementX/Sources/AppHooks/Hooks/ClientFactoryHook.swift
-    - path: ../../ElementX/Sources/AppHooks/Hooks/RemoteSettingsHook.swift
+    - path: ../../Seventwos/Sources/ShareExtension
+    - path: ../../Seventwos/Sources/AppHooks/AppHooks.swift
+    - path: ../../Seventwos/Sources/AppHooks/Hooks/TracingHook.swift
+    - path: ../../Seventwos/Sources/AppHooks/Hooks/ClientFactoryHook.swift
+    - path: ../../Seventwos/Sources/AppHooks/Hooks/RemoteSettingsHook.swift
     - path: ../../Components/Secrets/Secrets.swift
-    - path: ../../ElementX/Sources/Application/Settings
-    - path: ../../ElementX/Sources/Application/TargetConfiguration.swift
-    - path: ../../ElementX/Sources/Services/AlertTones/NotificationTone.swift
-    - path: ../../ElementX/Sources/Services/Keychain/KeychainController.swift
-    - path: ../../ElementX/Sources/Services/Keychain/KeychainControllerProtocol.swift
-    - path: ../../ElementX/Sources/Services/UserSession/RestorationToken.swift
-    - path: ../../ElementX/Sources/Services/UserSession/SessionDirectories.swift
-    - path: ../../ElementX/Sources/Other/Extensions/Bundle.swift
-    - path: ../../ElementX/Sources/Other/Extensions/Dictionary.swift
-    - path: ../../ElementX/Sources/Other/Extensions/FileManager.swift
-    - path: ../../ElementX/Sources/Other/Extensions/NSItemProvider.swift
-    - path: ../../ElementX/Sources/Other/Extensions/ProcessInfo.swift
-    - path: ../../ElementX/Sources/Other/Extensions/UIView.swift
-    - path: ../../ElementX/Sources/Other/Extensions/URL.swift
-    - path: ../../ElementX/Sources/Other/InfoPlistReader.swift
-    - path: ../../ElementX/Sources/Other/CurrentValuePublisher.swift
-    - path: ../../ElementX/Sources/Other/Logging
-    - path: ../../ElementX/Sources/UITests/UITestsScreenIdentifier.swift
+    - path: ../../Seventwos/Sources/Application/Settings
+    - path: ../../Seventwos/Sources/Application/TargetConfiguration.swift
+    - path: ../../Seventwos/Sources/Services/AlertTones/NotificationTone.swift
+    - path: ../../Seventwos/Sources/Services/Keychain/KeychainController.swift
+    - path: ../../Seventwos/Sources/Services/Keychain/KeychainControllerProtocol.swift
+    - path: ../../Seventwos/Sources/Services/UserSession/RestorationToken.swift
+    - path: ../../Seventwos/Sources/Services/UserSession/SessionDirectories.swift
+    - path: ../../Seventwos/Sources/Other/Extensions/Bundle.swift
+    - path: ../../Seventwos/Sources/Other/Extensions/Dictionary.swift
+    - path: ../../Seventwos/Sources/Other/Extensions/FileManager.swift
+    - path: ../../Seventwos/Sources/Other/Extensions/NSItemProvider.swift
+    - path: ../../Seventwos/Sources/Other/Extensions/ProcessInfo.swift
+    - path: ../../Seventwos/Sources/Other/Extensions/UIView.swift
+    - path: ../../Seventwos/Sources/Other/Extensions/URL.swift
+    - path: ../../Seventwos/Sources/Other/InfoPlistReader.swift
+    - path: ../../Seventwos/Sources/Other/CurrentValuePublisher.swift
+    - path: ../../Seventwos/Sources/Other/Logging
+    - path: ../../Seventwos/Sources/UITests/UITestsScreenIdentifier.swift

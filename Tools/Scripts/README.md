@@ -12,7 +12,7 @@ After that run `xcodegen` to regenerate the project.
 
 `createScreen.sh` script will create:
 
-- `Folder` within the `/ElementX/Sources/Screens/`. Files inside will be named `MyScreenNameXxx`.
+- `Folder` within the `/Seventwos/Sources/Screens/`. Files inside will be named `MyScreenNameXxx`.
 - `MyScreenNameScreenUITests.swift` within `UITests/Sources`
 - `MyScreenNameViewModelTests.swift` within `UnitTests/Sources/Unit`
 

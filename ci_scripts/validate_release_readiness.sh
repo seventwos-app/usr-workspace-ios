@@ -10,11 +10,11 @@ fail() {
 }
 
 app_config="$project_root/app.yml"
-app_settings="$project_root/ElementX/Sources/Application/Settings/AppSettings.swift"
+app_settings="$project_root/Seventwos/Sources/Application/Settings/AppSettings.swift"
 secrets="$project_root/Components/Secrets/Secrets.swift"
-target_config="$project_root/ElementX/SupportingFiles/target.yml"
-entitlements="$project_root/ElementX/SupportingFiles/ElementX.entitlements"
-bug_report_service="$project_root/ElementX/Sources/Services/BugReport/BugReportService.swift"
+target_config="$project_root/Seventwos/SupportingFiles/target.yml"
+entitlements="$project_root/Seventwos/SupportingFiles/Seventwos.entitlements"
+bug_report_service="$project_root/Seventwos/Sources/Services/BugReport/BugReportService.swift"
 
 for file in "$app_config" "$app_settings" "$secrets" "$target_config" "$entitlements" "$bug_report_service"; do
     [ -f "$file" ] || fail "missing required file: $file"

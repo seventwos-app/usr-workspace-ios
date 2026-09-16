@@ -1,0 +1,6 @@
+"NSCameraUsageDescription" = "Seventwos Workspace cần quyền truy cập camera để chụp ảnh hoặc quay video gửi tin nhắn.";
+"NSFaceIDUsageDescription" = "Sử dụng Face ID để truy cập ứng dụng.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "Để chia sẻ vị trí trực tiếp của bạn, Seventwos Workspace cần quyền truy cập vị trí khi ứng dụng đang chạy ngầm.";
+"NSLocationWhenInUseUsageDescription" = "Cấp quyền truy cập vị trí để Seventwos Workspace có thể chia sẻ vị trí của bạn.";
+"NSMicrophoneUsageDescription" = "Seventwos Workspace cần quyền truy cập micro để ghi và gửi tin nhắn âm thanh.";
+"NSPhotoLibraryUsageDescription" = "Tính năng này cho phép bạn lưu hình ảnh và video vào thư viện ảnh của mình.";

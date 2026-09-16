@@ -8,9 +8,9 @@ cd ..
 # Xcode Cloud shallow clones the repo. We need to deepen it to fetch tags, commit history and be able to rebase main on develop at the end of releases.
 fetch_unshallow_repository
 
-# Upload dsyms no matter the workflow
+# Upload dsyms when Seventwos-owned Sentry configuration is present.
 # Perform this step before releasing to github in case it fails.
-swift run -q tools ci upload-dsyms --dsym-path "$CI_ARCHIVE_PATH/dSYMs"
+upload_dsyms_if_configured
 
 generate_what_to_test_notes
 

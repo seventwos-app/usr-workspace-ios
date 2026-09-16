@@ -5,7 +5,7 @@
 // swiftformat:disable all
 
 import Testing
-@testable import ElementX
+@testable import Seventwos
 
 extension PreviewTests {
 

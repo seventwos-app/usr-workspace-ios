@@ -8,7 +8,7 @@
 
 import AsyncAlgorithms
 import Combine
-@testable import ElementX
+@testable import Seventwos
 import MatrixRustSDK
 import SwiftUI
 import Testing
