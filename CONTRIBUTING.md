@@ -1,4 +1,4 @@
-# Contributing to Element X iOS
+# Contributing to Seventwos Workspace for iOS
 
 Support can be found in [![Element X iOS Matrix room #element-x-ios:matrix.org](https://img.shields.io/matrix/element-x-ios:matrix.org.svg?label=%23element-x-ios:matrix.org&logo=matrix&server_fqdn=matrix.org)](https://matrix.to/#/#element-x-ios:matrix.org).
 
