@@ -1,0 +1,200 @@
+name: Required checks
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ format('required-checks-{0}', github.ref) }}
+  cancel-in-progress: true
+
+jobs:
+  classify:
+    name: Classify changes
+    runs-on: ubuntu-latest
+    outputs:
+      application: ${{ steps.changes.outputs.application }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Classify changed files
+        id: changes
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          application=false
+          while IFS= read -r path; do
+            case "$path" in
+              *.swift|Package.swift|Package.resolved|project.yml|app.yml|*/target.yml|ci_scripts/*|Tools/*|ElementX/*|NSE/*|ShareExtension/*|compound-ios/*)
+                application=true
+                break
+                ;;
+            esac
+          done < <(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
+          echo "application=$application" >> "$GITHUB_OUTPUT"
+
+  test-docs:
+    name: Test documentation
+    needs: classify
+    if: needs.classify.outputs.application != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Verify local README links
+        run: |
+          python3 - <<'PY'
+          import pathlib
+          import re
+          import urllib.parse
+
+          root = pathlib.Path.cwd()
+          readme = root / "README.md"
+          missing = []
+          for target in re.findall(r"\[[^]]*\]\(([^)]+)\)", readme.read_text()):
+              target = target.strip().split("#", 1)[0]
+              if not target or "://" in target or target.startswith(("mailto:", "#")):
+                  continue
+              path = root / urllib.parse.unquote(target)
+              if not path.exists():
+                  missing.append(target)
+          if missing:
+              raise SystemExit("Missing local README links: " + ", ".join(missing))
+          PY
+
+  test-app:
+    name: Test application
+    needs: classify
+    if: needs.classify.outputs.application == 'true'
+    runs-on: macos-26
+    timeout-minutes: 60
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up environment
+        run: source ci_scripts/ci_common.sh && setup_github_actions_environment
+
+      - name: Run unit tests
+        run: swift run -q tools ci unit-tests
+
+  test:
+    name: test
+    needs: [classify, test-docs, test-app]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify test result
+        env:
+          CLASSIFY_RESULT: ${{ needs.classify.result }}
+          DOCS_RESULT: ${{ needs.test-docs.result }}
+          APP_RESULT: ${{ needs.test-app.result }}
+        run: |
+          test "$CLASSIFY_RESULT" = success
+          test "$DOCS_RESULT" = success || test "$APP_RESULT" = success
+
+  lint-docs:
+    name: Lint documentation and workflows
+    needs: classify
+    if: needs.classify.outputs.application != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Check whitespace
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: git diff --check "$BASE_SHA" "$HEAD_SHA"
+
+      - name: Parse workflow YAML
+        run: ruby -e 'require "yaml"; Dir[".github/workflows/*.{yml,yaml}"].each { |path| YAML.load_file(path) }'
+
+  lint-app:
+    name: Lint application
+    needs: classify
+    if: needs.classify.outputs.application == 'true'
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up environment
+        run: source ci_scripts/ci_common.sh && setup_github_actions_environment
+
+      - name: Run formatters in lint mode
+        run: |
+          swiftformat --lint .
+          swiftlint --strict
+
+  lint:
+    name: lint
+    needs: [classify, lint-docs, lint-app]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify lint result
+        env:
+          CLASSIFY_RESULT: ${{ needs.classify.result }}
+          DOCS_RESULT: ${{ needs.lint-docs.result }}
+          APP_RESULT: ${{ needs.lint-app.result }}
+        run: |
+          test "$CLASSIFY_RESULT" = success
+          test "$DOCS_RESULT" = success || test "$APP_RESULT" = success
+
+  security:
+    name: security
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Review dependency changes
+        if: github.event_name == 'pull_request'
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+
+      - name: Verify external actions are pinned
+        run: |
+          python3 - <<'PY'
+          import pathlib
+          import re
+
+          failures = []
+          for path in pathlib.Path(".github/workflows").glob("*.y*ml"):
+              for line_number, line in enumerate(path.read_text().splitlines(), 1):
+                  match = re.search(r"\buses:\s*([^\s#]+)", line)
+                  if not match:
+                      continue
+                  action = match.group(1)
+                  if action.startswith("./"):
+                      continue
+                  ref = action.rsplit("@", 1)[-1]
+                  if not re.fullmatch(r"[0-9a-f]{40}", ref):
+                      failures.append(f"{path}:{line_number}: {action}")
+          if failures:
+              raise SystemExit("External actions must use full commit SHAs:\n" + "\n".join(failures))
+          PY
