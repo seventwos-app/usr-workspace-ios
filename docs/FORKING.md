@@ -5,10 +5,10 @@
 To create a fork, the first step is to update some of the project's configuration options such as the bundle identifier and the app's display name. To do this, open the `app.yml` file in the project root folder and at a minimum change these settings:
 
 ```
-APP_DISPLAY_NAME: Element X
-APP_GROUP_IDENTIFIER: group.io.element
-BASE_BUNDLE_IDENTIFIER: io.element.elementx
-DEVELOPMENT_TEAM: 7J4U792NQT
+APP_DISPLAY_NAME: Seventwos Workspace
+APP_GROUP_IDENTIFIER: group.org.seventwos.workspace
+BASE_BUNDLE_IDENTIFIER: org.seventwos.workspace
+DEVELOPMENT_TEAM: <YOUR_APPLE_DEVELOPMENT_TEAM>
 ```
 
 After making the changes, run `xcodegen` to regenerate the project.
@@ -19,9 +19,9 @@ Once your project is configured and compiles, you'll likely want to tweak how th
 
 ### Authentication
 
-This app's primary authentication method is to use OIDC against [Matrix Authentication Service](https://github.com/element-hq/matrix-authentication-service) (MAS). Unlike the older password-based authentication flows, this requires a small amount of configuration within the app. You need to make sure that all of the values passed to the SDK in the [OIDCConfiguration](https://github.com/element-hq/element-x-ios/blob/b2a37ec9d39622586754f58a98dcda35e0e8cf7e/ElementX/Sources/Application/AppSettings.swift#L206-L212) are hosted on the same domain otherwise dynamic client registration will fail. As we're using an [HTTPS callback](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/callback/https(host:path:)) for the web authentication, Apple validates ownership of the domain with the app. There are 2 steps to make sure this validation works:
+This app's primary authentication method is to use OIDC against [Matrix Authentication Service](https://github.com/element-hq/matrix-authentication-service) (MAS). Unlike the older password-based authentication flows, this requires a small amount of configuration within the app. You need to make sure that all of the values passed to the SDK in `OIDCConfiguration` are hosted on the same domain otherwise dynamic client registration will fail. As we're using an [HTTPS callback](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/callback/https(host:path:)) for the web authentication, Apple validates ownership of the domain with the app. There are 2 steps to make sure this validation works:
 - Add an [apple-app-site-association](https://developer.apple.com/documentation/xcode/supporting-associated-domains) file on your website with your app included in the `webcredentials` section.
-- Update the [webcredentials](https://github.com/element-hq/element-x-ios/blob/b2a37ec9d39622586754f58a98dcda35e0e8cf7e/ElementX/SupportingFiles/target.yml#L122) associated domain entitlement in the app to match your domain and re-run `xcodegen`.
+- Update the `webcredentials` associated domain entitlement in `ElementX/SupportingFiles/target.yml` to match your domain and re-run `xcodegen`.
 
 ### Setup the location sharing
 

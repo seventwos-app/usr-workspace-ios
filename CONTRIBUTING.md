@@ -1,6 +1,6 @@
 # Contributing to Seventwos Workspace for iOS
 
-Support can be found in [![Element X iOS Matrix room #element-x-ios:matrix.org](https://img.shields.io/matrix/element-x-ios:matrix.org.svg?label=%23element-x-ios:matrix.org&logo=matrix&server_fqdn=matrix.org)](https://matrix.to/#/#element-x-ios:matrix.org).
+For questions about this fork, please open a GitHub issue.
 
 ## Adding a new feature or enhancement
 
@@ -8,9 +8,9 @@ To make a great product with a great user experience, all the small efforts need
 
 Before making your contribution, please consider the following:
 
-* One product can’t do everything well. Element is focusing on private end-to-end encrypted messaging and voice - this can either be for consumers (e.g. friends and family) or for professional teams and organizations. Public forums and other types of chats without E2EE remain supported but are not the primary use case in case UX compromises need to be made.
-* There are 3 platforms - iOS, [Android](https://github.com/element-hq/element-x-android) and [Web/Desktop](https://github.com/element-hq/element-web). These platforms need to have feature parity and design consistency. For some features, supporting all platforms is a must have, in some cases exceptions can be made to have it on one platform only.
-* To make sure your idea fits both from a design/solution and use case perspective, please open a new issue (or find an existing issue) in [element-meta](https://github.com/element-hq/element-meta/issues) repository describing the use case and how you plan to tackle it. Do not just describe what feature is missing, explain why the users need it with a couple of real life examples from the field.
+* Seventwos Workspace prioritises private, end-to-end encrypted messaging and voice for individuals, teams, and organisations.
+* This iOS client is maintained independently. Cross-client parity is desirable where it serves Seventwos Workspace users, but is not a contribution requirement.
+* Before starting a significant feature, open or find an issue in this repository that explains the use case and intended approach.
   * In case of an existing issue, please comment that you're planning to contribute. If you create a new issue, please specify that in the issue. In such a case we will try to review the issue ASAP and provide you with initial feedback so you can be confident if and at which conditions your contributions will be accepted.
 
 Once we know that you want to contribute and have confirmed that the new feature is overall aligned with the product direction, the designers of the core team will help you with the designs and any other type of guidance when it comes to the user experience. We will try to unblock you as quickly as we can, but it may not be instant. Having a clear understanding of the use case and the impact of the feature will help us with the prioritization and faster responses.
@@ -55,9 +55,9 @@ This will:
 
 ### Xcode
 
-We suggest always using the Xcode version specified by `xcode_select_for_github_actions` in [ci_common.sh](https://github.com/element-hq/element-x-ios/blob/develop/ci_scripts/ci_common.sh).
+We suggest always using the Xcode version specified by `xcode_select_for_github_actions` in [ci_common.sh](ci_scripts/ci_common.sh).
 
-The Xcode project can be directly compiled through the shared Element X scheme which includes the main application as well as the unit and UI tests.
+The Xcode project can be directly compiled through the shared app scheme, which includes the main application as well as the unit and UI tests.
 
 The Xcode project itself is generated through [xcodegen](https://github.com/yonaskolb/XcodeGen) so any changes shouldn't be made directly to it but to the configuration files.
 
@@ -71,7 +71,7 @@ To setup the RustSDK in local development mode run the following command
 swift run tools build-sdk
 ```
 
-This will clone a copy of the SDK if needed, build it for all supported architectures and configure Element X to use the built framework. To learn about additional options run
+This will clone a copy of the SDK if needed, build it for all supported architectures and configure the app to use the built framework. To learn about additional options run
 
 ```
 swift run tools build-sdk --help
@@ -79,7 +79,7 @@ swift run tools build-sdk --help
 
 ### Tools
 
-The project depends on some tools for the build process which are normally installed through `swift run tools setup-project`. Installing them manually though is as easy as copying what the [script does](https://github.com/element-hq/element-x-ios/blob/develop/Tools/Sources/SetupProject.swift)
+The project depends on some tools for the build process which are normally installed through `swift run tools setup-project`. Installing them manually though is as easy as copying what the [script does](Tools/Sources/SetupProject.swift)
 
 ```
 brew install [...]
@@ -93,7 +93,7 @@ git lfs install
 
 ### Snapshot Tests
 
-If you make changes to the UI you may cause existing UI and Preview test snapshots to fail. The UITests run user flows and record snapshots while doing so using the settings defined under [checkEnvironments](https://github.com/element-hq/element-x-ios/blob/c29175d1f924e58b9646a200dbab0301fce3c258/UITests/Sources/Application.swift#L35-L37) while the PreviewTests use the settings defined in [PreviewTests.swift](https://github.com/element-hq/element-x-ios/blob/c29175d1f924e58b9646a200dbab0301fce3c258/PreviewTests/Sources/PreviewTests.swift#L18-L20). The snapshots are stored under `Sources/__Snapshots__` in their respective target's folder. 
+If you make changes to the UI you may cause existing UI and Preview test snapshots to fail. The UITests run user flows and record snapshots while doing so using the settings defined under `checkEnvironments`, while the PreviewTests use the settings defined in `PreviewTests.swift`. The snapshots are stored under `Sources/__Snapshots__` in their respective target's folder.
 
 To run the preview tests:
 
@@ -113,9 +113,9 @@ git config core.hooksPath .githooks
 
 ### Strings and Translations
 
-The project uses Localazy and is sharing its translations with the Element X Android project: https://localazy.com/p/element
+The project uses [Localazy](https://localazy.com/p/element) to manage translations.
 
-Please read the [Android docs](https://github.com/element-hq/element-x-android/blob/develop/tools/localazy/README.md) for more information about how this works. Note: On iOS we don't have the additional step of filtering strings per module.
+On iOS, strings do not need the additional per-module filtering step.
 
 Please do **not** manually edit the `Localizable.strings`, `Localizable.stringsdict` or `InfoPlist.strings` files! If your PR requires new strings to be added, add the `en` values to `Untranslated.strings`/`Untranslated.stringsdict` and one of the team will transfer them over to Localazy for you.
 
@@ -131,7 +131,7 @@ Note: We are in the process of converting our Fastlane lanes to Swift and so lon
 
 ### Network debugging proxy
 
-It's possible to debug the app's network traffic with a proxy server by setting the `HTTPS_PROXY` environment variable in the Element X scheme to the proxy's address (e.g. localhost:8080 for mitmproxy).
+It's possible to debug the app's network traffic with a proxy server by setting the `HTTPS_PROXY` environment variable in the app scheme to the proxy's address (e.g. localhost:8080 for mitmproxy).
 
 ## Pull requests
 
@@ -143,7 +143,7 @@ New screen flows are currently using the MVVM-Coordinator pattern. Please refer 
 
 ## Changelog
 
-Our [changelog](CHANGES.md) is automatically generated by GitHub, based on the PR title that you use when opening the issue. The changelog can be categorised by applying one of the [`pr-` labels](https://github.com/element-hq/element-x-ios/labels?q=pr-) to your PR. The mapping of Label → Section can be found in the [release.yml](.github/release.yml) file. The contribution will be automatically credited to your GitHub username.
+Our [changelog](CHANGES.md) is automatically generated by GitHub, based on the PR title that you use when opening the issue. The changelog can be categorised by applying one of the [`pr-` labels](https://github.com/seventwos-app/usr-workspace-ios/labels?q=pr-) to your PR. The mapping of Label → Section can be found in the [release.yml](.github/release.yml) file. The contribution will be automatically credited to your GitHub username.
 
 ## Coding style
 
@@ -152,7 +152,7 @@ Otherwise please have a look to [Apple Swift conventions](https://swift.org/docu
 
 We enforce the coding style by running checks on the CI for every PR through [PR Checks](.github/workflows/pr-checks.yml), [SwiftLint](.swiftlint.yml), [SwiftFormat](.swiftformat) and [SonarCloud](https://sonarcloud.io/project/overview?id=element-x-ios)
 
-We also gather coverage reports on every PR through [Codecov](https://app.codecov.io/gh/element-hq/element-x-ios) and will eventually start enforcing minimums.
+We also gather coverage reports on every PR through Codecov and will eventually start enforcing minimums.
 
 ## Thanks
 
