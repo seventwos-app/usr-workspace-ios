@@ -1,54 +1,45 @@
-# Forking
+# Seventwos repository configuration
 
-### Project Configuration
+## Project configuration
 
-To create a fork, the first step is to update some of the project's configuration options such as the bundle identifier and the app's display name. To do this, open the `app.yml` file in the project root folder and at a minimum change these settings:
+The repository defaults to the Seventwos product identity:
 
-```
+```yaml
 APP_DISPLAY_NAME: Seventwos Workspace
+PRODUCTION_APP_NAME: Seventwos Workspace
 APP_GROUP_IDENTIFIER: group.org.seventwos.workspace
 BASE_BUNDLE_IDENTIFIER: org.seventwos.workspace
-DEVELOPMENT_TEAM: <YOUR_APPLE_DEVELOPMENT_TEAM>
 ```
 
-After making the changes, run `xcodegen` to regenerate the project.
+`DEVELOPMENT_TEAM` is intentionally empty because no Seventwos Apple Developer account exists yet. This permits unsigned simulator development without inheriting Element's signing identity. Set the team through secured release automation or a local build-setting override after the account exists, then run `xcodegen` to regenerate the project. Do not commit signing certificates, provisioning profiles, App Store Connect keys, or team credentials.
 
-### Runtime Configuration
+The production application domain is `workspace.seventwos.org`. The checked-in associated-domain, OAuth redirect, account-provider, provisioning-host, and push-gateway defaults use that domain. Before enabling those capabilities in a signed build, Seventwos infrastructure must provide:
 
-Once your project is configured and compiles, you'll likely want to tweak how the app works. [AppSettings.swift](../ElementX/Sources/Application/AppSettings.swift) contains all of the settings used by the app at runtime.
+- Matrix client discovery and the push gateway expected by the app.
+- `apple-app-site-association` entries for `applinks` and `webcredentials` covering `org.seventwos.workspace`.
+- The OAuth callback path `/oauth/ios/org.seventwos.workspace` and matching MAS client metadata.
 
-### Authentication
+## Runtime configuration
 
-This app's primary authentication method is to use OIDC against [Matrix Authentication Service](https://github.com/element-hq/matrix-authentication-service) (MAS). Unlike the older password-based authentication flows, this requires a small amount of configuration within the app. You need to make sure that all of the values passed to the SDK in `OIDCConfiguration` are hosted on the same domain otherwise dynamic client registration will fail. As we're using an [HTTPS callback](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/callback/https(host:path:)) for the web authentication, Apple validates ownership of the domain with the app. There are 2 steps to make sure this validation works:
-- Add an [apple-app-site-association](https://developer.apple.com/documentation/xcode/supporting-associated-domains) file on your website with your app included in the `webcredentials` section.
-- Update the `webcredentials` associated domain entitlement in `ElementX/SupportingFiles/target.yml` to match your domain and re-run `xcodegen`.
+[AppSettings.swift](../ElementX/Sources/Application/Settings/AppSettings.swift) contains runtime service configuration. Required legal, policy, logo, and help URLs use `example.invalid` placeholders so the app cannot silently send users to inherited Element services or claim that unprovisioned Seventwos URLs exist. Replace every placeholder with an approved, live Seventwos URL before release; the manual **Release Readiness** workflow fails while any remain.
 
-### Setup the location sharing
+Analytics, Sentry, rageshake diagnostics, call analytics, and MapLibre are disabled in the checked-in `Components/Secrets/Secrets.swift`. To enable a Seventwos-owned deployment, inject the corresponding environment variables into trusted build automation and regenerate the file with:
 
-The location sharing feature is currently integrated with [MapLibre](https://maplibre.org).
-
-The MapLibre SDK requires an API key to work, so you need to get one for yourself. 
-
-After you get an API key, you need to configure the project by updating the `Secrets.swift`.
-
-It’s not recommended to push your API key in your repository since other people may get it so the mechanism for updating this file is left up to the reader. 
-
-An option would be to export it to your environment and use the existing `Secrets.pkl` file to update them like so:
-`pkl eval -o Secrets.swift Secrets.pkl`
-
-One way to avoid pushing the API key by mistake is running on your machine the command: 
-```
-git update-index assume-unchanged Components/Secrets/Secrets.swift
-``` 
-this will prevent pushing any update of the file `Secrets.swift`.
-
-Finally you need to setup your map styles overriding the values you find in AppSettings.swift:
-
-```swift
-MapTilerConfiguration(baseURL: "https://api.maptiler.com/maps",
-                      apiKey: Secrets.mapLibreAPIKey,
-                      lightStyleID: "your_style_id_light",
-                      darkStyleID: "your_style_id_dark")
+```sh
+pkl eval -o Components/Secrets/Secrets.swift Components/Secrets/Secrets.pkl
 ```
 
-You aren’t required to use custom styles here. You can use already available styles like `basic-v2` and `basic-v2-dark`
+Never commit the generated values. Release automation must restore the checked-in nil configuration after the archive is produced, and reviewers should verify that `Components/Secrets/Secrets.swift` contains only `nil` values. Partial call telemetry configuration is ignored: all call PostHog and Sentry values must be present before call telemetry is enabled.
+
+## Release preparation
+
+Repository automation does not publish an App Store build or dispatch to Element infrastructure. Calendar version updates and release-readiness checks are manual workflows. The GitHub release command targets `GITHUB_REPOSITORY` and pushes only its current branch; it does not merge or rebase `main`.
+
+Before creating a production archive:
+
+1. Create Seventwos Apple Developer and App Store Connect accounts; configure the team, certificates, identifiers, app group, push entitlement, and provisioning profiles outside the repository.
+2. Provision and verify the `workspace.seventwos.org` Matrix, OAuth, associated-domain, account-provisioning, and push services.
+3. Publish approved legal, privacy, support, security, logo, and encryption-help pages, then replace all `example.invalid` placeholders.
+4. Keep analytics, hosted diagnostics, maps, and call telemetry disabled unless Seventwos-owned endpoints and credentials are supplied through secret storage.
+5. Run `xcodegen`, build and test the Release configuration, and manually run the **Release Readiness** workflow.
+6. Review the archive's identifiers, entitlements, privacy disclosures, signing identity, and network destinations before uploading it to App Store Connect.

@@ -1,7 +1,7 @@
 ---
 name: ElementX
 attributes:
-  ORGANIZATIONNAME: Element
+  ORGANIZATIONNAME: Seventwos
   LastUpgradeCheck: "1620"
   
 fileGroups:
@@ -49,7 +49,7 @@ options:
 settings:
   CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED: true
   ENABLE_BITCODE: false
-  APP_NAME: ElementX
+  APP_NAME: SeventwosWorkspace
   KEYCHAIN_ACCESS_GROUP_IDENTIFIER: "$(DEVELOPMENT_TEAM).$(BASE_BUNDLE_IDENTIFIER)"
   MARKETING_VERSION: 26.09.2
   CURRENT_PROJECT_VERSION: 1
@@ -174,4 +174,3 @@ aggregateTargets:
         export PATH="$PATH:/opt/homebrew/bin"
         periphery scan --format xcode
       basedOnDependencyAnalysis: false
-

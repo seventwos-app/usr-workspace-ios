@@ -146,8 +146,8 @@ struct CI: ParsableCommand {
     // MARK: - Git
     
     static func gitConfigureGlobals() async throws {
-        try await CI.run(.name("git"), ["config", "--global", "user.name", "Element CI"])
-        try await CI.run(.name("git"), ["config", "--global", "user.email", "ci@element.io"])
+        try await CI.run(.name("git"), ["config", "--global", "user.name", "GitHub Actions"])
+        try await CI.run(.name("git"), ["config", "--global", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"])
     }
     
     static func gitRepositoryURL() async throws -> String {

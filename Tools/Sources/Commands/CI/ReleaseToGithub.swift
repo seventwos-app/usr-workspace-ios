@@ -12,6 +12,7 @@ struct ReleaseToGitHub: AsyncParsableCommand {
         case failedToParseResponse
         case missingReleaseNotes
         case failedToReadVersion
+        case missingGitHubRepository
         
         var errorDescription: String? {
             switch self {
@@ -25,6 +26,8 @@ struct ReleaseToGitHub: AsyncParsableCommand {
                 return "The generated release notes are empty."
             case .failedToReadVersion:
                 return "Failed to read the marketing version from project.yml."
+            case .missingGitHubRepository:
+                return "The GITHUB_REPOSITORY environment variable is not set to an owner/repository value."
             }
         }
     }
@@ -61,8 +64,6 @@ struct ReleaseToGitHub: AsyncParsableCommand {
         try await CI.run(.name("git"), ["commit", "-m", "Prepare next release"])
         
         try await CI.gitPush()
-        
-        try await rebaseMainOntoCurrentBranch()
     }
     
     // MARK: - Private
@@ -73,7 +74,11 @@ struct ReleaseToGitHub: AsyncParsableCommand {
             throw ReleaseError.missingGitHubToken
         }
         
-        let url = URL(string: "https://api.github.com/repos/element-hq/element-x-ios/releases")!
+        guard let repository = ProcessInfo.processInfo.environment["GITHUB_REPOSITORY"],
+              repository.range(of: #"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"#, options: .regularExpression) != nil,
+              let url = URL(string: "https://api.github.com/repos/\(repository)/releases") else {
+            throw ReleaseError.missingGitHubRepository
+        }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("Bearer \(apiToken)", forHTTPHeaderField: "Authorization")
@@ -139,21 +144,4 @@ struct ReleaseToGitHub: AsyncParsableCommand {
         return "\(year).\(month).\(patch)"
     }
     
-    private func rebaseMainOntoCurrentBranch() async throws {
-        guard let currentBranch = try await CI.run(.name("git"), ["rev-parse", "--abbrev-ref", "HEAD"], output: .string(limit: 4096))
-            .standardOutput.map({ $0.trimmingCharacters(in: .whitespacesAndNewlines) }) else {
-            throw ValidationError("Could not determine the current branch.")
-        }
-        
-        logger.info("Current branch: \(currentBranch)")
-        
-        try await CI.run(.name("git"), ["reset", "--hard"])
-        try await CI.run(.name("git"), ["checkout", "main"])
-        try await CI.run(.name("git"), ["pull", "origin", "main"])
-        try await CI.run(.name("git"), ["rebase", currentBranch])
-        
-        try await CI.gitPush()
-        
-        logger.info("Successfully rebased main onto \(currentBranch)")
-    }
 }

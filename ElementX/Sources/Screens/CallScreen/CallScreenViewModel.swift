@@ -164,10 +164,13 @@ class CallScreenViewModel: CallScreenViewModelType, CallScreenViewModelProtocol 
             }
             
             // We only set the analytics configuration if analytics are enabled
-            let analyticsConfiguration: ElementCallAnalyticsConfiguration? = if analyticsService.isEnabled {
-                .init(posthogAPIHost: appSettings.elementCallPosthogAPIHost,
-                      posthogAPIKey: appSettings.elementCallPosthogAPIKey,
-                      sentryDSN: appSettings.elementCallPosthogSentryDSN)
+            let analyticsConfiguration: ElementCallAnalyticsConfiguration? = if analyticsService.isEnabled,
+                                                                                let postHogHost = appSettings.elementCallPostHogHost,
+                                                                                let postHogAPIKey = appSettings.elementCallPostHogAPIKey,
+                                                                                let sentryDSN = appSettings.elementCallSentryDSN {
+                .init(posthogAPIHost: postHogHost,
+                      posthogAPIKey: postHogAPIKey,
+                      sentryDSN: sentryDSN)
             } else {
                 nil
             }

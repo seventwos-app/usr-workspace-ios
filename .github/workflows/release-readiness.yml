@@ -1,0 +1,44 @@
+name: Release Readiness
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  repository-configuration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Verify release-owned configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if grep -R "example.invalid" \
+            ElementX/Sources/Application/Settings/AppSettings.swift; then
+            echo "::error::Replace documented policy and help URL placeholders before release."
+            exit 1
+          fi
+
+          if grep -Eq 'DEVELOPMENT_TEAM:[[:space:]]*""' app.yml; then
+            echo "::error::Configure the Seventwos Apple Development Team before release."
+            exit 1
+          fi
+
+          if grep -RE 'element\.io|vector\.im|sentry\.tools\.element\.io|posthog-element-call\.element\.io' \
+            app.yml \
+            Components/Secrets/Secrets.swift \
+            ElementX/SupportingFiles/target.yml \
+            ElementX/Sources/Application/Settings/AppSettings.swift \
+            ElementX/Sources/Services/BugReport/BugReportService.swift; then
+            echo "::error::Inherited Element production service configuration remains."
+            exit 1
+          fi
+
+          grep -q 'BASE_BUNDLE_IDENTIFIER: org.seventwos.workspace' app.yml
+          grep -q 'workspace.seventwos.org' ElementX/Sources/Application/Settings/AppSettings.swift
