@@ -1,6 +1,6 @@
 # AGENTS.md — Seventwos Workspace for iOS
 
-> **Repo:** `element-hq/element-x-ios` — iOS Matrix client (SwiftUI + `matrix-rust-sdk`).
+> **Repo:** `seventwos-app/usr-workspace-ios` — Seventwos Workspace for iOS, a Matrix client built with SwiftUI and `matrix-rust-sdk`.
 > **Keep current:** Change break fact here — path, command, convention, structure? Fix that fact, same PR. Change not described here? Leave file alone. Edit file? Use caveman skill — match terse voice. No caveman, no edit.
 
 ---
@@ -33,11 +33,11 @@ PRs must follow rules. Prefer Xcode MCP tools over terminal commands.
 
 ### Strings & Localisation
 
-- Default localisation: `en` (en-GB strings), shared with Element X Android via [Localazy](https://localazy.com/p/element).
+- Default localisation: `en` (en-GB strings), managed through [Localazy](https://localazy.com/p/element).
 - **Never edit `Localizable.strings`** — auto-overwritten.
 - New English strings → **`Untranslated.strings`** (plurals: `Untranslated.stringsdict`). Team imports to Localazy before merge.
 - Access strings via generated `L10n` types (e.g. `L10n.actionDone`).
-- **Key naming** (see [element-x-android README](https://github.com/element-hq/element-x-android/blob/develop/tools/localazy/README.md#key-naming-rules)):
+- **Key naming**:
   - Cross-screen verbs: `action_`. Nouns/other: `common_`. Accessibility: `a11y_`.
   - Key match string, e.g. `action_copy_link` → `Copy link`.
   - Screen-specific: `screen_<name>_<free>` (e.g. `screen_onboarding_welcome_title`).
