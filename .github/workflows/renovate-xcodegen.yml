@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.head_ref }}
-          token: ${{ secrets.ELEMENT_BOT_TOKEN }}
+          token: ${{ github.token }}
           # We need to push any changes to the project.
           persist-credentials: true
 
@@ -52,8 +52,8 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          git config user.name "Element CI"
-          git config user.email "ci@element.io"
+          git config user.name "GitHub Actions"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add ElementX.xcodeproj/project.pbxproj
           git add ElementX.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
           git add ElementX/SupportingFiles/Settings.bundle

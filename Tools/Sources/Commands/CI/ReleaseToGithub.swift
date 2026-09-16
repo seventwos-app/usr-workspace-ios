@@ -3,6 +3,8 @@ import Foundation
 import Yams
 
 struct ReleaseToGitHub: AsyncParsableCommand {
+    private static let repository = "seventwos-app/usr-workspace-ios"
+
     static let configuration = CommandConfiguration(commandName: "release-to-github",
                                                     abstract: "Creates a GitHub release and updates CHANGES.md with generated release notes.")
     
@@ -30,6 +32,9 @@ struct ReleaseToGitHub: AsyncParsableCommand {
     }
     
     func run() async throws {
+        let readinessScript = URL.projectDirectory.appending(path: "ci_scripts/validate_release_readiness.sh").path
+        try await CI.run(.path("/bin/sh"), [readinessScript, URL.projectDirectory.path])
+
         let currentVersion = try CI.readMarketingVersion()
         logger.info("Creating GitHub release for version \(currentVersion)…")
         
@@ -61,8 +66,6 @@ struct ReleaseToGitHub: AsyncParsableCommand {
         try await CI.run(.name("git"), ["commit", "-m", "Prepare next release"])
         
         try await CI.gitPush()
-        
-        try await rebaseMainOntoCurrentBranch()
     }
     
     // MARK: - Private
@@ -73,7 +76,7 @@ struct ReleaseToGitHub: AsyncParsableCommand {
             throw ReleaseError.missingGitHubToken
         }
         
-        let url = URL(string: "https://api.github.com/repos/element-hq/element-x-ios/releases")!
+        let url = URL(string: "https://api.github.com/repos/\(Self.repository)/releases")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("Bearer \(apiToken)", forHTTPHeaderField: "Authorization")
@@ -139,21 +142,4 @@ struct ReleaseToGitHub: AsyncParsableCommand {
         return "\(year).\(month).\(patch)"
     }
     
-    private func rebaseMainOntoCurrentBranch() async throws {
-        guard let currentBranch = try await CI.run(.name("git"), ["rev-parse", "--abbrev-ref", "HEAD"], output: .string(limit: 4096))
-            .standardOutput.map({ $0.trimmingCharacters(in: .whitespacesAndNewlines) }) else {
-            throw ValidationError("Could not determine the current branch.")
-        }
-        
-        logger.info("Current branch: \(currentBranch)")
-        
-        try await CI.run(.name("git"), ["reset", "--hard"])
-        try await CI.run(.name("git"), ["checkout", "main"])
-        try await CI.run(.name("git"), ["pull", "origin", "main"])
-        try await CI.run(.name("git"), ["rebase", currentBranch])
-        
-        try await CI.gitPush()
-        
-        logger.info("Successfully rebased main onto \(currentBranch)")
-    }
 }

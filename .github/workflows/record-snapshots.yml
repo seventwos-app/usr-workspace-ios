@@ -47,8 +47,8 @@ jobs:
 
       - name: Commit and push updated snapshots
         run: |
-          git config user.name "Element CI"
-          git config user.email "ci@element.io"
+          git config user.name "GitHub Actions"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           # Stage only snapshot changes.
           git add PreviewTests/Sources/__Snapshots__/
@@ -57,7 +57,7 @@ jobs:
             echo "✅ No snapshot changes detected."
           else
             git commit -m "Record preview snapshots"
-            git push origin HEAD:refs/heads/${GITHUB_EVENT_PULL_REQUEST_HEAD_REF}
+            git push origin "HEAD:refs/heads/${GITHUB_EVENT_PULL_REQUEST_HEAD_REF}"
             echo "✅ Snapshots recorded and pushed."
           fi
         env:
