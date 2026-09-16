@@ -1,5 +1,6 @@
 # Reporting a Vulnerability
 
-**If you've found a security vulnerability in Element software, please report it to security@element.io.**
+If you find a security vulnerability in Seventwos Workspace for iOS, please
+[report it privately through GitHub Security Advisories](https://github.com/seventwos-app/usr-workspace-ios/security/advisories/new).
 
-For more information on our security disclosure policy, visit https://element.io/security/security-disclosure-policy.
+Do not disclose security vulnerabilities in public issues.
