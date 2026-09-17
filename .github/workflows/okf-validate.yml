@@ -1,0 +1,34 @@
+name: OKF validate
+
+# Validates seventwos-owned documentation/ content against the Open
+# Knowledge Format (OKF) v0.2 convention. Scoped to documentation/ only:
+# this repo is a fork of an upstream project, and the inherited upstream
+# markdown corpus (READMEs, CHANGELOGs, upstream docs) predates our
+# stewardship and is out of scope for this convention.
+on:
+  pull_request:
+    paths:
+      - "documentation/**"
+      - "scripts/okf/**"
+
+permissions:
+  contents: read
+
+jobs:
+  okf-validate:
+    name: okf-validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Validator unit tests
+        run: python3 -m unittest scripts/okf/validate_okf_markdown_test.py -v
+
+      - name: Validate changed documentation/ markdown against OKF v0.2
+        run: python3 scripts/okf/validate_okf_markdown.py --changed
