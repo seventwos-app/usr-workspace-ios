@@ -28,9 +28,10 @@ jobs:
     steps:
       - name: Remove label
         if: github.event.label.name == 'record-snapshots'
-        uses: actions-ecosystem/action-remove-labels@2ce5d41b4b6aa8503e285553f75ed56e0a40bae0 #v1.3.0
-        with:
-          labels: record-snapshots
+        run: gh api --method DELETE "repos/${GITHUB_REPOSITORY}/issues/${GITHUB_EVENT_PULL_REQUEST_NUMBER}/labels/record-snapshots"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_EVENT_PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
 
       - name: Checkout PR
         uses: nschloe/action-cached-lfs-checkout@385a8ecc719e50b8c71af6ab01a624b486b7c3bc # v1.2.5
