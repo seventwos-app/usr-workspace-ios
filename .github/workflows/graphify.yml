@@ -27,7 +27,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install graphify
-        run: pip install --upgrade graphifyy
+        run: pip install --upgrade 'graphifyy[gemini]'
 
       - name: Run graphify extraction (headless CI)
         env:
