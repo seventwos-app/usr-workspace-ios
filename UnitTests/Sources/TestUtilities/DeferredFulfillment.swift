@@ -106,7 +106,7 @@ func deferFulfillment<Value: Sendable>(_ asyncSequence: any AsyncSequence<Value,
                                        until condition: @escaping (Value) -> Bool) -> DeferredFulfillment<Value> {
     let (stream, continuation) = AsyncStream<Value>.makeStream()
     
-    let task = Task {
+    let task = Task.immediate {
         for await value in asyncSequence where condition(value) {
             continuation.yield(value)
             continuation.finish()

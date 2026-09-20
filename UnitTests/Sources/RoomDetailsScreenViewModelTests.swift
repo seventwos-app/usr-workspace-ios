@@ -176,8 +176,7 @@ struct RoomDetailsScreenViewModelTests {
         #expect(context.viewState.dmRecipientInfo?.member == RoomMemberDetails(withProxy: recipient))
         
         #expect(!context.viewState.isProcessingIgnoreRequest)
-        let deferredProcessing = deferFulfillment(context.$viewState,
-                                                  keyPath: \.isProcessingIgnoreRequest,
+        let deferredProcessing = deferFulfillment(context.observe(\.viewState.isProcessingIgnoreRequest),
                                                   transitionValues: [true, false])
         
         context.send(viewAction: .ignoreConfirmed)
@@ -209,8 +208,7 @@ struct RoomDetailsScreenViewModelTests {
         #expect(context.viewState.dmRecipientInfo?.member == RoomMemberDetails(withProxy: recipient))
         
         #expect(!context.viewState.isProcessingIgnoreRequest)
-        let deferredProcessing = deferFulfillment(context.$viewState,
-                                                  keyPath: \.isProcessingIgnoreRequest,
+        let deferredProcessing = deferFulfillment(context.observe(\.viewState.isProcessingIgnoreRequest),
                                                   transitionValues: [true, false])
         
         context.send(viewAction: .ignoreConfirmed)
@@ -241,8 +239,7 @@ struct RoomDetailsScreenViewModelTests {
         #expect(context.viewState.dmRecipientInfo?.member == RoomMemberDetails(withProxy: recipient))
         
         #expect(!context.viewState.isProcessingIgnoreRequest)
-        let deferredProcessing = deferFulfillment(context.$viewState,
-                                                  keyPath: \.isProcessingIgnoreRequest,
+        let deferredProcessing = deferFulfillment(context.observe(\.viewState.isProcessingIgnoreRequest),
                                                   transitionValues: [true, false])
         
         context.send(viewAction: .unignoreConfirmed)
