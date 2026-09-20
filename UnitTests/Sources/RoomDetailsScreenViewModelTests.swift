@@ -176,7 +176,7 @@ struct RoomDetailsScreenViewModelTests {
         #expect(context.viewState.dmRecipientInfo?.member == RoomMemberDetails(withProxy: recipient))
         
         #expect(!context.viewState.isProcessingIgnoreRequest)
-        let deferredProcessing = deferFulfillment(viewModel.context.$viewState,
+        let deferredProcessing = deferFulfillment(context.$viewState,
                                                   keyPath: \.isProcessingIgnoreRequest,
                                                   transitionValues: [true, false])
         
@@ -209,7 +209,7 @@ struct RoomDetailsScreenViewModelTests {
         #expect(context.viewState.dmRecipientInfo?.member == RoomMemberDetails(withProxy: recipient))
         
         #expect(!context.viewState.isProcessingIgnoreRequest)
-        let deferredProcessing = deferFulfillment(viewModel.context.$viewState,
+        let deferredProcessing = deferFulfillment(context.$viewState,
                                                   keyPath: \.isProcessingIgnoreRequest,
                                                   transitionValues: [true, false])
         
@@ -241,7 +241,7 @@ struct RoomDetailsScreenViewModelTests {
         #expect(context.viewState.dmRecipientInfo?.member == RoomMemberDetails(withProxy: recipient))
         
         #expect(!context.viewState.isProcessingIgnoreRequest)
-        let deferredProcessing = deferFulfillment(viewModel.context.$viewState,
+        let deferredProcessing = deferFulfillment(context.$viewState,
                                                   keyPath: \.isProcessingIgnoreRequest,
                                                   transitionValues: [true, false])
         
