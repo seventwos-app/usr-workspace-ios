@@ -39,12 +39,22 @@ jobs:
         run: graphify export html || true
 
       - name: Open PR with graph updates
-        uses: peter-evans/create-pull-request@v6
-        with:
-          commit-message: "chore: update graphify knowledge graph"
-          title: "chore: update graphify knowledge graph"
-          body: Automated graphify knowledge-graph update.
-          branch: graphify/update
-          base: develop
-          delete-branch: true
-          add-paths: graphify-out
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          if [ -z "$(git status --porcelain graphify-out)" ]; then
+            echo "No graph changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -B graphify/update
+          git add graphify-out
+          git commit -m "chore: update graphify knowledge graph"
+          git push -f origin graphify/update
+          if ! gh pr list --head graphify/update --state open --json number --jq '.[0].number' | grep -q .; then
+            gh pr create --title "chore: update graphify knowledge graph" \
+                          --body "Automated graphify knowledge-graph update." \
+                          --base develop --head graphify/update
+          fi
