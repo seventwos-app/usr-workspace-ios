@@ -42,7 +42,7 @@ jobs:
 
       - name: Open PR with graph updates
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
           set -e
           if [ -z "$(git status --porcelain graphify-out)" ]; then
