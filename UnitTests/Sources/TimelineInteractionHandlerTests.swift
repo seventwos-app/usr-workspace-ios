@@ -6,8 +6,8 @@
 //
 
 import Combine
-@testable import Seventwos
 import Foundation
+@testable import Seventwos
 import Testing
 
 @MainActor

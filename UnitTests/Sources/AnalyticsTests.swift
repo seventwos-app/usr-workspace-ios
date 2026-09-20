@@ -7,8 +7,8 @@
 //
 
 import AnalyticsEvents
-@testable import Seventwos
 import PostHog
+@testable import Seventwos
 import Testing
 
 @MainActor

@@ -6,9 +6,9 @@
 // Please see LICENSE files in the repository root for full details.
 //
 
-@testable import Seventwos
 import MatrixRustSDK
 import MatrixRustSDKMocks
+@testable import Seventwos
 import Testing
 
 @MainActor

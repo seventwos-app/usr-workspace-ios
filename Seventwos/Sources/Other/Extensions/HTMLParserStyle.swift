@@ -12,17 +12,17 @@ import SwiftUI
 
 extension HTMLParserStyle {
     static let seventwos = HTMLParserStyle(textColor: UIColor.label,
-                                          linkColor: UIColor.link,
-                                          codeBlockStyle: BlockStyle(backgroundColor: UIColor.compound._bgCodeBlock,
-                                                                     borderColor: UIColor.compound.borderInteractiveSecondary,
-                                                                     borderWidth: 1.0,
-                                                                     cornerRadius: 2.0,
-                                                                     padding: BlockStyle.Padding(horizontal: 10, vertical: 12),
-                                                                     type: .background),
-                                          quoteBlockStyle: BlockStyle(backgroundColor: UIColor.compound.iconTertiary,
+                                           linkColor: UIColor.link,
+                                           codeBlockStyle: BlockStyle(backgroundColor: UIColor.compound._bgCodeBlock,
                                                                       borderColor: UIColor.compound.borderInteractiveSecondary,
-                                                                      borderWidth: 0.0,
-                                                                      cornerRadius: 0.0,
-                                                                      padding: BlockStyle.Padding(horizontal: 25, vertical: 12),
-                                                                      type: .side(offset: 5, width: 4)))
+                                                                      borderWidth: 1.0,
+                                                                      cornerRadius: 2.0,
+                                                                      padding: BlockStyle.Padding(horizontal: 10, vertical: 12),
+                                                                      type: .background),
+                                           quoteBlockStyle: BlockStyle(backgroundColor: UIColor.compound.iconTertiary,
+                                                                       borderColor: UIColor.compound.borderInteractiveSecondary,
+                                                                       borderWidth: 0.0,
+                                                                       cornerRadius: 0.0,
+                                                                       padding: BlockStyle.Padding(horizontal: 25, vertical: 12),
+                                                                       type: .side(offset: 5, width: 4)))
 }

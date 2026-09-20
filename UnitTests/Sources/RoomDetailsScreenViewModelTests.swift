@@ -8,8 +8,8 @@
 
 import AsyncAlgorithms
 import Combine
-@testable import Seventwos
 import MatrixRustSDK
+@testable import Seventwos
 import SwiftUI
 import Testing
 

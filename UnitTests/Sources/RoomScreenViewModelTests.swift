@@ -7,10 +7,10 @@
 //
 
 import Combine
-@testable import Seventwos
 import Foundation
 import MatrixRustSDK
 import MatrixRustSDKMocks
+@testable import Seventwos
 import Synchronization
 import Testing
 

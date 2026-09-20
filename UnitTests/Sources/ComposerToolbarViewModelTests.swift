@@ -7,9 +7,9 @@
 //
 
 import Combine
-@testable import Seventwos
 import Foundation
 import MatrixRustSDK
+@testable import Seventwos
 import Testing
 import WysiwygComposer
 
