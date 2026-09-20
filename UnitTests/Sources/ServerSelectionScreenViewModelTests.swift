@@ -382,7 +382,7 @@ struct ServerSelectionScreenViewModelTests {
                                  analyticsTermsURL: appSettings.analyticsTermsURL,
                                  mapTilerConfiguration: appSettings.mapTilerConfiguration)
         }
-
+        
         let factoryConfiguration = ClientFactoryMock.Configuration()
         // matrix.org: OAuth. example.com: password only. server.net: no login. secure.gov: OAuth + Element Pro required.
         client = factoryConfiguration.homeserverClients["matrix.org"]
