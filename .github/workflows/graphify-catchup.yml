@@ -1,0 +1,62 @@
+name: Graphify Semantic Catch-up
+
+on:
+  schedule:
+    # Runs once daily; retries only files still missing semantic extraction
+    # (Gemini free-tier quota resets daily), so full semantic coverage
+    # converges over a few days without ever exceeding quota.
+    - cron: '17 3 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: graphify-catchup-develop
+  cancel-in-progress: true
+
+jobs:
+  graphify-catchup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: develop
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install graphify
+        run: pip install --upgrade 'graphifyy[gemini]'
+
+      - name: Retry semantic extraction for still-uncached files
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: graphify extract . --update --backend gemini --max-concurrency 1
+
+      - name: Export interactive HTML
+        run: graphify export html || true
+
+      - name: Open PR with graph updates
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          if [ -z "$(git status --porcelain graphify-out)" ]; then
+            echo "No graph changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -B graphify/update
+          git add graphify-out
+          git commit -m "chore: catch up graphify semantic extraction"
+          git push -f origin graphify/update
+          if ! gh pr list --head graphify/update --state open --json number --jq '.[0].number' | grep -q .; then
+            gh pr create --title "chore: update graphify knowledge graph" \
+                          --body "Automated graphify knowledge-graph update (semantic catch-up)." \
+                          --base develop --head graphify/update
+          fi
