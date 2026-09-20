@@ -1,1 +1,26 @@
 * @a-tcp
+
+# Selective upstream synchronization policy and its report-only automation.
+/.seventwos/ @a-tcp
+/.github/workflows/upstream-assessment.yml @a-tcp
+/ci_scripts/validate_upstream_policy.py @a-tcp
+/ci_scripts/validate_upstream_policy_test.py @a-tcp
+
+# Product identity and user-facing application surfaces.
+/app.yml @a-tcp
+/project.yml @a-tcp
+/Seventwos/ @a-tcp
+
+# Authentication, cryptography, and persisted user data.
+/Seventwos/Sources/Application/ @a-tcp
+/Seventwos/Sources/UserSession/ @a-tcp
+/Seventwos/Sources/Services/ @a-tcp
+/Components/ @a-tcp
+
+# Release-sensitive configuration and generated project artifacts.
+/ci_scripts/validate_release_readiness.sh @a-tcp
+/.github/workflows/release-readiness.yml @a-tcp
+/Seventwos/SupportingFiles/ @a-tcp
+/NSE/SupportingFiles/ @a-tcp
+/ShareExtension/SupportingFiles/ @a-tcp
+/Seventwos.xcodeproj/ @a-tcp

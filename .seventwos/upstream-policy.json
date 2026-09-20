@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "policy_id": "seventwos-selective-upstream-synchronization",
+  "upstream": {
+    "repository": "element-hq/element-x-ios",
+    "branch": "develop"
+  },
+  "synchronization": {
+    "mode": "selective",
+    "default_action": "assess_only",
+    "allow_automatic_apply": false,
+    "allow_automatic_merge": false,
+    "requires_human_intent_review_when_unknown": true
+  },
+  "protected_invariants": ".seventwos/upstream-invariants.json",
+  "path_map": ".seventwos/upstream-path-map.json",
+  "state": ".seventwos/upstream-state.json",
+  "ledger": ".seventwos/upstream-ledger.jsonl"
+}

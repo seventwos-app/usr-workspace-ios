@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "invariants": [
+    {
+      "id": "product-identity",
+      "classification": "behavioral",
+      "sources": [
+        {
+          "path": "app.yml",
+          "must_contain": [
+            "APP_DISPLAY_NAME: Seventwos Workspace",
+            "PRODUCTION_APP_NAME: Seventwos Workspace",
+            "BASE_BUNDLE_IDENTIFIER: org.seventwos.workspace",
+            "APP_GROUP_IDENTIFIER: group.org.seventwos.workspace"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "seventwos-endpoints",
+      "classification": "behavioral",
+      "sources": [
+        {
+          "path": "Seventwos/Sources/Application/Settings/AppSettings.swift",
+          "must_contain": [
+            "workspace.seventwos.org",
+            "example.invalid"
+          ],
+          "must_not_contain": [
+            "element.io",
+            "vector.im"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "empty-signing-team",
+      "classification": "behavioral",
+      "sources": [
+        {
+          "path": "app.yml",
+          "must_contain": [
+            "DEVELOPMENT_TEAM: \"\""
+          ]
+        }
+      ]
+    },
+    {
+      "id": "inherited-telemetry-disabled",
+      "classification": "behavioral",
+      "sources": [
+        {
+          "path": "Components/Secrets/Secrets.swift",
+          "must_contain": [
+            "static let sentryDSN: String? = nil",
+            "static let postHogHost: String? = nil",
+            "static let rageshakeURL: String? = nil",
+            "static let elementCallPostHogHost: String? = nil",
+            "static let elementCallSentryDSN: String? = nil"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "release-readiness-fails-closed",
+      "classification": "behavioral",
+      "sources": [
+        {
+          "path": "ci_scripts/validate_release_readiness.sh",
+          "must_contain": [
+            "set -eu",
+            "fail()",
+            "example.invalid",
+            "inherited Element production service configuration remains."
+          ]
+        },
+        {
+          "path": ".github/workflows/release-readiness.yml",
+          "must_contain": [
+            "ci_scripts/validate_release_readiness.sh"
+          ]
+        }
+      ]
+    }
+  ]
+}
