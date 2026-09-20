@@ -281,7 +281,7 @@ struct ServerSelectionScreenViewModelTests {
     @Test
     mutating func autocompleteFromAccountProviders() async throws {
         // Given a view model with no previous server history, falling back to the default account providers.
-        try setup(authenticationFlow: .login)
+        try setup(authenticationFlow: .login, accountProviders: [.generic("matrix.org")])
         #expect(appSettings.previousServers.isEmpty)
         context.serverNameOrBaseURL = ""
         let textField = UITextField()

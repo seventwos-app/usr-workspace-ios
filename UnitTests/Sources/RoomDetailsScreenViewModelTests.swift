@@ -158,40 +158,16 @@ struct RoomDetailsScreenViewModelTests {
     @Test
     mutating func ignoreSuccess() async throws {
         let recipient = RoomMemberProxyMock.mockDan
-        
-        let mockedMembers: [RoomMemberProxyMock] = [.mockMe, recipient]
-        roomProxyMock = JoinedRoomProxyMock(.init(name: "Test", isDirect: true, isEncrypted: true, members: mockedMembers))
-        viewModel = RoomDetailsScreenViewModel(roomProxy: roomProxyMock,
-                                               userSession: UserSessionMock(.init()),
-                                               appHooks: AppHooks(),
-                                               analyticsService: AnalyticsServiceMock(.init()),
-                                               userIndicatorController: UserIndicatorControllerMock(),
-                                               notificationSettingsProxy: NotificationSettingsProxyMock(with: NotificationSettingsProxyMockConfiguration()),
-                                               attributedStringBuilder: AttributedStringBuilder(mentionBuilder: MentionBuilder()))
-        
-        let deferredRecipient = deferFulfillment(viewModel.context.observe(\.viewState.dmRecipientInfo)) { $0 != nil }
-        
-        try await deferredRecipient.fulfill()
-        
-        #expect(context.viewState.dmRecipientInfo?.member == RoomMemberDetails(withProxy: recipient))
-        
-        #expect(!context.viewState.isProcessingIgnoreRequest)
-        let deferredProcessing = deferFulfillment(context.observe(\.viewState.isProcessingIgnoreRequest),
-                                                  transitionValues: [true, false])
-        
-        context.send(viewAction: .ignoreConfirmed)
-        
-        try await deferredProcessing.fulfill()
-        
-        #expect(context.viewState.dmRecipientInfo?.member.isIgnored == true)
-    }
-    
-    @Test
-    mutating func ignoreFailure() async throws {
-        let recipient = RoomMemberProxyMock.mockDan
         let mockedMembers: [RoomMemberProxyMock] = [.mockMe, recipient]
         let clientProxy = ClientProxyMock(.init())
-        clientProxy.ignoreUserReturnValue = .failure(.sdkError(ClientProxyMockError.generic))
+        let (requestStartedStream, requestStartedContinuation) = AsyncStream<Void>.makeStream()
+        let (resumeRequestStream, resumeRequestContinuation) = AsyncStream<Void>.makeStream()
+        clientProxy.ignoreUserClosure = { _ in
+            requestStartedContinuation.yield()
+            var iterator = resumeRequestStream.makeAsyncIterator()
+            _ = await iterator.next()
+            return .success(())
+        }
         roomProxyMock = JoinedRoomProxyMock(.init(name: "Test", isDirect: true, isEncrypted: true, members: mockedMembers))
         viewModel = RoomDetailsScreenViewModel(roomProxy: roomProxyMock,
                                                userSession: UserSessionMock(.init(clientProxy: clientProxy)),
@@ -208,24 +184,34 @@ struct RoomDetailsScreenViewModelTests {
         #expect(context.viewState.dmRecipientInfo?.member == RoomMemberDetails(withProxy: recipient))
         
         #expect(!context.viewState.isProcessingIgnoreRequest)
-        let deferredProcessing = deferFulfillment(context.observe(\.viewState.isProcessingIgnoreRequest),
-                                                  transitionValues: [true, false])
-        
+        let requestStarted = deferFulfillment(requestStartedStream) { _ in true }
         context.send(viewAction: .ignoreConfirmed)
+        try await requestStarted.fulfill()
+        #expect(context.viewState.isProcessingIgnoreRequest)
         
-        try await deferredProcessing.fulfill()
-        
-        #expect(context.viewState.dmRecipientInfo?.member.isIgnored == false)
-        #expect(context.alertInfo != nil)
+        let requestFinished = deferFulfillment(context.observe(\.viewState.isProcessingIgnoreRequest)) { !$0 }
+        resumeRequestContinuation.yield()
+        resumeRequestContinuation.finish()
+        try await requestFinished.fulfill()
+        #expect(context.viewState.dmRecipientInfo?.member.isIgnored == true)
     }
     
     @Test
-    mutating func unignoreSuccess() async throws {
-        let recipient = RoomMemberProxyMock.mockIgnored
+    mutating func ignoreFailure() async throws {
+        let recipient = RoomMemberProxyMock.mockDan
         let mockedMembers: [RoomMemberProxyMock] = [.mockMe, recipient]
+        let clientProxy = ClientProxyMock(.init())
+        let (requestStartedStream, requestStartedContinuation) = AsyncStream<Void>.makeStream()
+        let (resumeRequestStream, resumeRequestContinuation) = AsyncStream<Void>.makeStream()
+        clientProxy.ignoreUserClosure = { _ in
+            requestStartedContinuation.yield()
+            var iterator = resumeRequestStream.makeAsyncIterator()
+            _ = await iterator.next()
+            return .failure(.sdkError(ClientProxyMockError.generic))
+        }
         roomProxyMock = JoinedRoomProxyMock(.init(name: "Test", isDirect: true, isEncrypted: true, members: mockedMembers))
         viewModel = RoomDetailsScreenViewModel(roomProxy: roomProxyMock,
-                                               userSession: UserSessionMock(.init()),
+                                               userSession: UserSessionMock(.init(clientProxy: clientProxy)),
                                                appHooks: AppHooks(),
                                                analyticsService: AnalyticsServiceMock(.init()),
                                                userIndicatorController: UserIndicatorControllerMock(),
@@ -239,13 +225,57 @@ struct RoomDetailsScreenViewModelTests {
         #expect(context.viewState.dmRecipientInfo?.member == RoomMemberDetails(withProxy: recipient))
         
         #expect(!context.viewState.isProcessingIgnoreRequest)
-        let deferredProcessing = deferFulfillment(context.observe(\.viewState.isProcessingIgnoreRequest),
-                                                  transitionValues: [true, false])
+        let requestStarted = deferFulfillment(requestStartedStream) { _ in true }
+        context.send(viewAction: .ignoreConfirmed)
+        try await requestStarted.fulfill()
+        #expect(context.viewState.isProcessingIgnoreRequest)
         
+        let requestFinished = deferFulfillment(context.observe(\.viewState.isProcessingIgnoreRequest)) { !$0 }
+        resumeRequestContinuation.yield()
+        resumeRequestContinuation.finish()
+        try await requestFinished.fulfill()
+        #expect(context.viewState.dmRecipientInfo?.member.isIgnored == false)
+        #expect(context.alertInfo != nil)
+    }
+    
+    @Test
+    mutating func unignoreSuccess() async throws {
+        let recipient = RoomMemberProxyMock.mockIgnored
+        let mockedMembers: [RoomMemberProxyMock] = [.mockMe, recipient]
+        let clientProxy = ClientProxyMock(.init())
+        let (requestStartedStream, requestStartedContinuation) = AsyncStream<Void>.makeStream()
+        let (resumeRequestStream, resumeRequestContinuation) = AsyncStream<Void>.makeStream()
+        clientProxy.unignoreUserClosure = { _ in
+            requestStartedContinuation.yield()
+            var iterator = resumeRequestStream.makeAsyncIterator()
+            _ = await iterator.next()
+            return .success(())
+        }
+        roomProxyMock = JoinedRoomProxyMock(.init(name: "Test", isDirect: true, isEncrypted: true, members: mockedMembers))
+        viewModel = RoomDetailsScreenViewModel(roomProxy: roomProxyMock,
+                                               userSession: UserSessionMock(.init(clientProxy: clientProxy)),
+                                               appHooks: AppHooks(),
+                                               analyticsService: AnalyticsServiceMock(.init()),
+                                               userIndicatorController: UserIndicatorControllerMock(),
+                                               notificationSettingsProxy: NotificationSettingsProxyMock(with: NotificationSettingsProxyMockConfiguration()),
+                                               attributedStringBuilder: AttributedStringBuilder(mentionBuilder: MentionBuilder()))
+        
+        let deferredRecipient = deferFulfillment(viewModel.context.observe(\.viewState.dmRecipientInfo)) { $0 != nil }
+        
+        try await deferredRecipient.fulfill()
+        
+        #expect(context.viewState.dmRecipientInfo?.member == RoomMemberDetails(withProxy: recipient))
+        
+        #expect(!context.viewState.isProcessingIgnoreRequest)
+        let requestStarted = deferFulfillment(requestStartedStream) { _ in true }
         context.send(viewAction: .unignoreConfirmed)
+        try await requestStarted.fulfill()
+        #expect(context.viewState.isProcessingIgnoreRequest)
         
-        try await deferredProcessing.fulfill()
-        
+        let requestFinished = deferFulfillment(context.observe(\.viewState.isProcessingIgnoreRequest)) { !$0 }
+        resumeRequestContinuation.yield()
+        resumeRequestContinuation.finish()
+        try await requestFinished.fulfill()
         #expect(context.viewState.dmRecipientInfo?.member.isIgnored == false)
     }
     

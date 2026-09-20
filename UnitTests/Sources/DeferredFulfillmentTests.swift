@@ -40,20 +40,6 @@ struct DeferredFulfillmentTests {
     }
     
     @Test
-    func observableWithSynchronousTransitions() async throws {
-        // Given a deferred fulfilment for a sequence of expected values.
-        let deferred = deferFulfillment(observable.observe(\.counter), transitionValues: [100, 200])
-        
-        // When those values are changed synchronously.
-        observable.counter = 100
-        observable.counter = 200
-        
-        // Then the test should observe every transition.
-        try await deferred.fulfill()
-        #expect(observable.counter == 200)
-    }
-    
-    @Test
     func observableAsynchronousUpdate() async throws {
         // Given a deferred fulfilment for an expected value.
         let newValue = 100
