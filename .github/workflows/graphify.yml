@@ -2,7 +2,7 @@ name: Graphify
 
 on:
   push:
-    branches: [develop]
+    branches: [main]
     paths-ignore:
       - 'graphify-out/**'
   workflow_dispatch: {}
@@ -12,7 +12,7 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: graphify-${{ github.ref }}
+  group: graphify-develop
   cancel-in-progress: true
 
 jobs:
@@ -33,7 +33,11 @@ jobs:
       - name: Run graphify extraction (headless CI)
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: graphify extract . --backend gemini --max-concurrency 1
+        run: |
+          graphify extract . --backend gemini --max-concurrency 1 || {
+            echo "::warning::Gemini semantic extraction failed (likely quota) - falling back to --code-only so a graph still ships. A scheduled catch-up run will retry semantic extraction daily."
+            graphify extract . --code-only --force
+          }
 
       - name: Export interactive HTML
         run: graphify export html || true
