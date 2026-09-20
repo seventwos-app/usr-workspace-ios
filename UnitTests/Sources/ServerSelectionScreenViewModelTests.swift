@@ -380,7 +380,7 @@ struct ServerSelectionScreenViewModelTests {
                                  accountProvisioningHost: appSettings.accountProvisioningHost,
                                  bugReportApplicationID: appSettings.bugReportApplicationID,
                                  analyticsTermsURL: appSettings.analyticsTermsURL,
-                                 mapTilerConfiguration: appSettings.mapTilerConfiguration)
+                                 mapTilerConfiguration: appSettings.mapTilerConfiguration.publisher.value)
         }
         
         let factoryConfiguration = ClientFactoryMock.Configuration()
