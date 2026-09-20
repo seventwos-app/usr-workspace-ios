@@ -29,7 +29,7 @@ struct ServerSelectionScreenViewModelTests {
     @Test
     mutating func selectForLogin() async throws {
         // Given a view model for login.
-        try setup(authenticationFlow: .login)
+        try setup(authenticationFlow: .login, accountProviders: [.generic("matrix.org")])
         #expect(service.homeserver.value.loginMode == .unknown)
         #expect(clientFactory.makeAuthenticationClientServerNameOrBaseURLSessionDirectoriesPassphraseClientSessionDelegateAppSettingsAppHooksCallsCount == 0)
         
@@ -355,9 +355,34 @@ struct ServerSelectionScreenViewModelTests {
     // MARK: - Helpers
     
     private mutating func setup(authenticationFlow: AuthenticationFlow,
-                                mode: ServerSelectionScreenMode = .userInput) throws {
+                                mode: ServerSelectionScreenMode = .userInput,
+                                accountProviders: [AccountProvider]? = nil) throws {
         appSettings = AppSettings.volatile()
         
+        if let accountProviders {
+            appSettings.override(accountProviders: accountProviders,
+                                 allowOtherAccountProviders: appSettings.allowOtherAccountProviders,
+                                 hideBrandChrome: appSettings.hideBrandChrome,
+                                 pushGatewayBaseURL: appSettings.pushGatewayBaseURL,
+                                 oAuthRedirectURL: appSettings.oAuthRedirectURL,
+                                 oAuthClientURIPath: appSettings.oAuthClientURIPath,
+                                 websiteURL: appSettings.websiteURL,
+                                 logoURL: appSettings.logoURL,
+                                 copyrightURL: appSettings.copyrightURL,
+                                 acceptableUseURL: appSettings.acceptableUseURL,
+                                 privacyURL: appSettings.privacyURL,
+                                 encryptionURL: appSettings.encryptionURL,
+                                 deviceVerificationURL: appSettings.deviceVerificationURL,
+                                 chatBackupDetailsURL: appSettings.chatBackupDetailsURL,
+                                 identityPinningViolationDetailsURL: appSettings.identityPinningViolationDetailsURL,
+                                 historySharingDetailsURL: appSettings.historySharingDetailsURL,
+                                 elementWebHosts: appSettings.elementWebHosts,
+                                 accountProvisioningHost: appSettings.accountProvisioningHost,
+                                 bugReportApplicationID: appSettings.bugReportApplicationID,
+                                 analyticsTermsURL: appSettings.analyticsTermsURL,
+                                 mapTilerConfiguration: appSettings.mapTilerConfiguration)
+        }
+
         let factoryConfiguration = ClientFactoryMock.Configuration()
         // matrix.org: OAuth. example.com: password only. server.net: no login. secure.gov: OAuth + Element Pro required.
         client = factoryConfiguration.homeserverClients["matrix.org"]
