@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-09-20T12:29:12Z",
+  "fork": {
+    "repository": "seventwos-app/usr-workspace-ios",
+    "default_branch": "develop",
+    "develop_sha": "0e66db0c63f8ca348fd047275a787e07f78a6bd7",
+    "head_sha": "0e66db0c63f8ca348fd047275a787e07f78a6bd7",
+    "evidence": {
+      "method": "git rev-parse HEAD, develop, origin/develop; gh repo view",
+      "observed_at": "2026-09-20T12:29:12Z"
+    }
+  },
+  "upstream": {
+    "repository": "element-hq/element-x-ios",
+    "branch": "develop",
+    "sha": "fb49f5b83b30de8b8c52b3b467e9ca29357fc131",
+    "evidence": {
+      "method": "git ls-remote https://github.com/element-hq/element-x-ios.git refs/heads/develop",
+      "observed_at": "2026-09-20T12:29:12Z"
+    }
+  },
+  "merge_bases": {
+    "fork_head_to_fork_develop": {
+      "sha": "0e66db0c63f8ca348fd047275a787e07f78a6bd7",
+      "status": "observed",
+      "evidence": "HEAD and origin/develop resolved to the same commit."
+    },
+    "fork_develop_to_upstream_develop": {
+      "sha": null,
+      "status": "unknown",
+      "intent": "human_review_required",
+      "reason": "The local repository has no upstream remote or upstream commit object, so a merge base cannot be computed without fetching immutable upstream history."
+    }
+  },
+  "intent": {
+    "status": "unknown",
+    "required_reviewer_decision": "Classify each candidate upstream change as adopt, adapt, defer, or reject before any change is applied."
+  },
+  "actions_observation": {
+    "run_id": 35505923901,
+    "workflow": "Unit Tests",
+    "head_sha": "0e66db0c63f8ca348fd047275a787e07f78a6bd7",
+    "conclusion": "startup_failure",
+    "available_evidence": "GitHub API returned no jobs and no run log for this run.",
+    "diagnosis": "scheduler-level startup failure only; root cause is not observable from the available run metadata and is intentionally not inferred."
+  }
+}

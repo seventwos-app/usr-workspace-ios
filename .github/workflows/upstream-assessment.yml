@@ -1,0 +1,108 @@
+name: Upstream Assessment
+
+on:
+  pull_request:
+    paths:
+      - ".seventwos/**"
+      - "ci_scripts/validate_upstream_policy.py"
+      - "ci_scripts/validate_upstream_policy_test.py"
+      - ".github/workflows/upstream-assessment.yml"
+      - "CODEOWNERS"
+  push:
+    branches:
+      - develop
+    paths:
+      - ".seventwos/**"
+      - "ci_scripts/validate_upstream_policy.py"
+      - "ci_scripts/validate_upstream_policy_test.py"
+      - ".github/workflows/upstream-assessment.yml"
+      - "CODEOWNERS"
+  merge_group:
+    types: [checks_requested]
+  workflow_dispatch:
+    inputs:
+      upstream_sha:
+        description: Immutable element-hq/element-x-ios develop SHA to assess
+        required: true
+        default: fb49f5b83b30de8b8c52b3b467e9ca29357fc131
+        type: string
+      fork_sha:
+        description: Immutable seventwos-app/usr-workspace-ios develop SHA used as the baseline
+        required: true
+        default: 0e66db0c63f8ca348fd047275a787e07f78a6bd7
+        type: string
+      mode:
+        description: Assessment execution mode
+        required: true
+        default: assess_only
+        type: choice
+        options:
+          - assess_only
+
+permissions:
+  contents: read
+
+jobs:
+  assess:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.0.0
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Install policy validator dependency
+        run: python3 -m pip install --disable-pip-version-check PyYAML==6.0.2
+
+      - name: Validate immutable inputs and policy
+        env:
+          FORK_SHA: ${{ inputs.fork_sha || '0e66db0c63f8ca348fd047275a787e07f78a6bd7' }}
+          MODE: ${{ inputs.mode || 'assess_only' }}
+          UPSTREAM_SHA: ${{ inputs.upstream_sha || 'fb49f5b83b30de8b8c52b3b467e9ca29357fc131' }}
+          POLICY_BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event_name == 'merge_group' && github.event.merge_group.base_sha || github.event.before }}
+        run: |
+          set -eu
+          python3 ci_scripts/validate_upstream_policy.py --verify-remote
+          python3 - <<'PY'
+          import json
+          import os
+          import sys
+
+          state = json.load(open(".seventwos/upstream-state.json", encoding="utf-8"))
+          expected = {
+              "UPSTREAM_SHA": state["upstream"]["sha"],
+              "FORK_SHA": state["fork"]["develop_sha"],
+              "MODE": "assess_only",
+          }
+          mismatches = [name for name, value in expected.items() if os.environ[name] != value]
+          if mismatches:
+              sys.exit(f"immutable assessment inputs do not match recorded state: {', '.join(mismatches)}")
+          PY
+
+      - name: Produce read-only assessment report
+        env:
+          FORK_SHA: ${{ inputs.fork_sha }}
+          UPSTREAM_SHA: ${{ inputs.upstream_sha }}
+        run: |
+          set -eu
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          state = json.load(open(".seventwos/upstream-state.json", encoding="utf-8"))
+          Path("upstream-assessment-report.json").write_text(json.dumps({
+              "mode": "assess_only",
+              "fork_sha": state["fork"]["develop_sha"],
+              "upstream_sha": state["upstream"]["sha"],
+              "merge_base": state["merge_bases"]["fork_develop_to_upstream_develop"],
+              "ledger_transition": json.loads(Path(".seventwos/upstream-ledger.jsonl").read_text().splitlines()[-1]),
+              "result": "No upstream content was fetched, applied, merged, or proposed. Human intent review is required.",
+          }, indent=2) + "\n", encoding="utf-8")
+          PY
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: upstream-assessment-report
+          path: upstream-assessment-report.json
+          if-no-files-found: error
