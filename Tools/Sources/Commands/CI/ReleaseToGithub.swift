@@ -4,7 +4,7 @@ import Yams
 
 struct ReleaseToGitHub: AsyncParsableCommand {
     private static let repository = "seventwos-app/usr-workspace-ios"
-
+    
     static let configuration = CommandConfiguration(commandName: "release-to-github",
                                                     abstract: "Creates a GitHub release and updates CHANGES.md with generated release notes.")
     
@@ -34,7 +34,7 @@ struct ReleaseToGitHub: AsyncParsableCommand {
     func run() async throws {
         let readinessScript = URL.projectDirectory.appending(path: "ci_scripts/validate_release_readiness.sh").path
         try await CI.run(.path("/bin/sh"), [readinessScript, URL.projectDirectory.path])
-
+        
         let currentVersion = try CI.readMarketingVersion()
         logger.info("Creating GitHub release for version \(currentVersion)…")
         
@@ -141,5 +141,4 @@ struct ReleaseToGitHub: AsyncParsableCommand {
         
         return "\(year).\(month).\(patch)"
     }
-    
 }

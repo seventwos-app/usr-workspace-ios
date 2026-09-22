@@ -7,19 +7,21 @@
 //
 
 import AnalyticsEvents
-@testable import Seventwos
 import PostHog
+@testable import Seventwos
 import Testing
 
 @MainActor
 final class AnalyticsTests {
+    private let analyticsConfiguration = AnalyticsConfiguration(host: "https://posthog.example.com",
+                                                                apiKey: "test-api-key")
     private let appSettings: AppSettings
     private let analytics: AnalyticsServiceProtocol
     private let analyticsClient: AnalyticsClientMock
     private var posthogMock: PHGPostHogMock
     
     init() {
-        appSettings = AppSettings.volatile()
+        appSettings = AppSettings.volatile(analyticsConfiguration: analyticsConfiguration)
         
         analyticsClient = AnalyticsClientMock()
         analyticsClient.isRunning = false
@@ -168,11 +170,11 @@ final class AnalyticsTests {
     }
     
     @Test
-    func sendingUserProperties() throws {
+    func sendingUserProperties() {
         // Given a client with user properties set
         
         let client = PostHogAnalyticsClient(posthogFactory: MockPostHogFactory(mock: posthogMock))
-        try client.start(analyticsConfiguration: #require(appSettings.analyticsConfiguration))
+        client.start(analyticsConfiguration: analyticsConfiguration)
         
         client.updateUserProperties(AnalyticsEvent.UserProperties(URLPreviewsEnabled: nil,
                                                                   allChatsActiveFilter: nil,
@@ -221,10 +223,10 @@ final class AnalyticsTests {
     }
     
     @Test
-    func sendingAndUpdatingSuperProperties() throws {
+    func sendingAndUpdatingSuperProperties() {
         // Given a client with user properties set
         let client = PostHogAnalyticsClient(posthogFactory: MockPostHogFactory(mock: posthogMock))
-        try client.start(analyticsConfiguration: #require(appSettings.analyticsConfiguration))
+        client.start(analyticsConfiguration: analyticsConfiguration)
         
         client.updateSuperProperties(AnalyticsEvent.SuperProperties(appPlatform: .EXI,
                                                                     cryptoSDK: .Rust,
@@ -278,7 +280,7 @@ final class AnalyticsTests {
     }
     
     @Test
-    func shouldNotReportIfNotStarted() throws {
+    func shouldNotReportIfNotStarted() {
         // Given a client with user properties set
         let client = PostHogAnalyticsClient(posthogFactory: MockPostHogFactory(mock: posthogMock))
         
@@ -305,7 +307,7 @@ final class AnalyticsTests {
         #expect(posthogMock.capturePropertiesUserPropertiesCalled == false)
         
         // start now
-        try client.start(analyticsConfiguration: #require(appSettings.analyticsConfiguration))
+        client.start(analyticsConfiguration: analyticsConfiguration)
         #expect(posthogMock.optInCalled == true)
         
         client.capture(someEvent)

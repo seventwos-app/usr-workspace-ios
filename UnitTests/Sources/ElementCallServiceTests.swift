@@ -6,8 +6,8 @@
 //
 
 import CallKit
-@testable import Seventwos
 import PushKit
+@testable import Seventwos
 import Testing
 
 @MainActor

@@ -6,8 +6,8 @@
 // Please see LICENSE files in the repository root for full details.
 //
 
-@testable import Seventwos
 import MatrixRustSDKMocks
+@testable import Seventwos
 import SwiftUI
 import Testing
 
@@ -29,7 +29,7 @@ struct ServerSelectionScreenViewModelTests {
     @Test
     mutating func selectForLogin() async throws {
         // Given a view model for login.
-        try setup(authenticationFlow: .login)
+        try setup(authenticationFlow: .login, accountProviders: [.generic("matrix.org")])
         #expect(service.homeserver.value.loginMode == .unknown)
         #expect(clientFactory.makeAuthenticationClientServerNameOrBaseURLSessionDirectoriesPassphraseClientSessionDelegateAppSettingsAppHooksCallsCount == 0)
         
@@ -281,7 +281,7 @@ struct ServerSelectionScreenViewModelTests {
     @Test
     mutating func autocompleteFromAccountProviders() async throws {
         // Given a view model with no previous server history, falling back to the default account providers.
-        try setup(authenticationFlow: .login)
+        try setup(authenticationFlow: .login, accountProviders: [.generic("matrix.org")])
         #expect(appSettings.previousServers.isEmpty)
         context.serverNameOrBaseURL = ""
         let textField = UITextField()
@@ -355,8 +355,33 @@ struct ServerSelectionScreenViewModelTests {
     // MARK: - Helpers
     
     private mutating func setup(authenticationFlow: AuthenticationFlow,
-                                mode: ServerSelectionScreenMode = .userInput) throws {
+                                mode: ServerSelectionScreenMode = .userInput,
+                                accountProviders: [AccountProvider]? = nil) throws {
         appSettings = AppSettings.volatile()
+        
+        if let accountProviders {
+            appSettings.override(accountProviders: accountProviders,
+                                 allowOtherAccountProviders: appSettings.allowOtherAccountProviders,
+                                 hideBrandChrome: appSettings.hideBrandChrome,
+                                 pushGatewayBaseURL: appSettings.pushGatewayBaseURL,
+                                 oAuthRedirectURL: appSettings.oAuthRedirectURL,
+                                 oAuthClientURIPath: appSettings.oAuthClientURIPath,
+                                 websiteURL: appSettings.websiteURL,
+                                 logoURL: appSettings.logoURL,
+                                 copyrightURL: appSettings.copyrightURL,
+                                 acceptableUseURL: appSettings.acceptableUseURL,
+                                 privacyURL: appSettings.privacyURL,
+                                 encryptionURL: appSettings.encryptionURL,
+                                 deviceVerificationURL: appSettings.deviceVerificationURL,
+                                 chatBackupDetailsURL: appSettings.chatBackupDetailsURL,
+                                 identityPinningViolationDetailsURL: appSettings.identityPinningViolationDetailsURL,
+                                 historySharingDetailsURL: appSettings.historySharingDetailsURL,
+                                 elementWebHosts: appSettings.elementWebHosts,
+                                 accountProvisioningHost: appSettings.accountProvisioningHost,
+                                 bugReportApplicationID: appSettings.bugReportApplicationID,
+                                 analyticsTermsURL: appSettings.analyticsTermsURL,
+                                 mapTilerConfiguration: appSettings.mapTilerConfiguration.publisher.value)
+        }
         
         let factoryConfiguration = ClientFactoryMock.Configuration()
         // matrix.org: OAuth. example.com: password only. server.net: no login. secure.gov: OAuth + Element Pro required.

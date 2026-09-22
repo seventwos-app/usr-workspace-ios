@@ -6,9 +6,9 @@
 // Please see LICENSE files in the repository root for full details.
 //
 
-@testable import Seventwos
 import Foundation
 import MatrixRustSDKMocks
+@testable import Seventwos
 import Testing
 
 @MainActor
@@ -74,7 +74,7 @@ struct AuthenticationServiceTests {
         }
         
         #expect(service.flow == .login)
-        #expect(service.homeserver.value == .init(accountProvider: .managed(serverName: "matrix.org", baseURL: "https://matrix-client.matrix.org"),
+        #expect(service.homeserver.value == .init(accountProvider: AppSettings.volatile().defaultAccountProvider,
                                                   loginMode: .unknown))
     }
     

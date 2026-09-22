@@ -7,8 +7,8 @@
 //
 
 import Combine
-@testable import Seventwos
 import MatrixRustSDKMocks
+@testable import Seventwos
 import Testing
 
 @MainActor

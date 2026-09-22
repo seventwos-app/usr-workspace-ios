@@ -5,10 +5,10 @@
 // Please see LICENSE files in the repository root for full details.
 //
 
-@testable import Seventwos
 import Foundation
 import MatrixRustSDK
 import MatrixRustSDKMocks
+@testable import Seventwos
 import Testing
 
 @MainActor

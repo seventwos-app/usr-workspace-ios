@@ -7,9 +7,9 @@
 //
 
 import Combine
-@testable import Seventwos
 import Foundation
 import Macros
+@testable import Seventwos
 import Testing
 
 struct UserPreferenceTests {

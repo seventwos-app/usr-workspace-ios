@@ -303,7 +303,7 @@ final nonisolated class AppSettings: @unchecked Sendable {
     // MARK: - Analytics
     
     /// The configuration to use for analytics. Set to `nil` to disable analytics.
-    let analyticsConfiguration: AnalyticsConfiguration? = AppSettings.makeAnalyticsConfiguration()
+    let analyticsConfiguration: AnalyticsConfiguration?
     /// The URL to open with more information about analytics terms. When this is `nil` the "Learn more" link will be hidden.
     private(set) var analyticsTermsURL: URL?
     /// Whether or not there the app is able ask for user consent to enable analytics or sentry reporting.
@@ -461,12 +461,14 @@ final nonisolated class AppSettings: @unchecked Sendable {
     @UserPreference(defaultValue: AppBuildType.current != .release)
     var developerOptionsEnabled: Bool
     
-    init(store: UserDefaultsProtocol) {
+    init(store: UserDefaultsProtocol,
+         analyticsConfiguration: AnalyticsConfiguration? = AppSettings.makeAnalyticsConfiguration()) {
         self.store = store
+        self.analyticsConfiguration = analyticsConfiguration
     }
     
-    static func volatile() -> AppSettings {
-        AppSettings(store: VolatileUserDefaults())
+    static func volatile(analyticsConfiguration: AnalyticsConfiguration? = AppSettings.makeAnalyticsConfiguration()) -> AppSettings {
+        AppSettings(store: VolatileUserDefaults(), analyticsConfiguration: analyticsConfiguration)
     }
 }
 

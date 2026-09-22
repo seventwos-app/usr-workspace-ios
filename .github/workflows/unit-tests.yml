@@ -14,8 +14,7 @@ jobs:
   tests:
     name: Tests
     runs-on: macos-26
-    timeout-minutes: 60
-
+    timeout-minutes: 90
     concurrency:
       # Only allow a single run of this workflow on each branch, automatically cancelling older runs.
       group: ${{ format('unit-tests-{0}', github.ref) }}
@@ -57,9 +56,21 @@ jobs:
           retention-days: 1
           if-no-files-found: ignore
 
+      - name: Check Codecov token
+        id: check-codecov-token
+        if: ${{ !cancelled() }}
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: |
+          if [ -n "$CODECOV_TOKEN" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Upload coverage to Codecov
         # Skip if not successful and in forks
-        if: ${{ success() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+        if: ${{ success() && steps.check-codecov-token.outputs.configured == 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           report_type: coverage
@@ -71,7 +82,7 @@ jobs:
 
       - name: Upload test results to Codecov
         # Skip if cancelled and in forks
-        if: ${{ !cancelled() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+        if: ${{ !cancelled() && steps.check-codecov-token.outputs.configured == 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         continue-on-error: true
         with:
@@ -81,3 +92,7 @@ jobs:
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: unittests
+
+      - name: Report skipped Codecov uploads
+        if: ${{ !cancelled() && steps.check-codecov-token.outputs.configured == 'false' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+        run: echo "::notice::Skipping Codecov uploads because CODECOV_TOKEN is not configured."

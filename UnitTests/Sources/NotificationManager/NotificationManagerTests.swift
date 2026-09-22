@@ -7,8 +7,8 @@
 //
 
 import Combine
-@testable import Seventwos
 import NotificationCenter
+@testable import Seventwos
 import Testing
 
 @MainActor

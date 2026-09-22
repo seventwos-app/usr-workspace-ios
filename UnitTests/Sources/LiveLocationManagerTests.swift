@@ -7,8 +7,8 @@
 
 import Combine
 import CoreLocation
-@testable import Seventwos
 import Foundation
+@testable import Seventwos
 import Testing
 
 @MainActor

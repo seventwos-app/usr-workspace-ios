@@ -5,8 +5,8 @@
 // Please see LICENSE files in the repository root for full details.
 //
 
-@testable import Seventwos
 import Foundation
+@testable import Seventwos
 import Testing
 
 struct NSItemProviderTests {
