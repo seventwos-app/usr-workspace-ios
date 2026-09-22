@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "mapping_rules": [
+    {
+      "kind": "path",
+      "upstream": "ElementX",
+      "seventwos": "Seventwos",
+      "intent": "product application target source root"
+    },
+    {
+      "kind": "path",
+      "upstream": "ElementX/Sources",
+      "seventwos": "Seventwos/Sources",
+      "intent": "application source"
+    },
+    {
+      "kind": "path",
+      "upstream": "ElementX/Resources",
+      "seventwos": "Seventwos/Resources",
+      "intent": "application resources"
+    },
+    {
+      "kind": "path",
+      "upstream": "ElementX/SupportingFiles",
+      "seventwos": "Seventwos/SupportingFiles",
+      "intent": "application target configuration and entitlements"
+    },
+    {
+      "kind": "xcode_target",
+      "upstream": "ElementX",
+      "seventwos": "Seventwos",
+      "intent": "primary app target"
+    },
+    {
+      "kind": "xcode_scheme",
+      "upstream": "ElementX",
+      "seventwos": "Seventwos",
+      "intent": "primary app scheme"
+    },
+    {
+      "kind": "generated_artifact",
+      "upstream": "ElementX.xcodeproj/project.pbxproj",
+      "seventwos": "Seventwos.xcodeproj/project.pbxproj",
+      "generator": "XcodeGen",
+      "source_of_truth": "project.yml, app.yml, and target.yml files"
+    },
+    {
+      "kind": "generated_artifact",
+      "upstream": "ElementX.xcodeproj/xcshareddata/xcschemes/ElementX.xcscheme",
+      "seventwos": "Seventwos.xcodeproj/xcshareddata/xcschemes/Seventwos.xcscheme",
+      "generator": "XcodeGen",
+      "source_of_truth": "project.yml, app.yml, and target.yml files"
+    }
+  ]
+}
