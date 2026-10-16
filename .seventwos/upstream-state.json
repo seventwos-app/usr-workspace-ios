@@ -1,36 +1,36 @@
 {
   "schema_version": 1,
-  "recorded_at": "2026-09-20T12:29:12Z",
+  "recorded_at": "2026-10-16T11:50:36Z",
   "fork": {
     "repository": "seventwos-app/usr-workspace-ios",
     "default_branch": "develop",
-    "develop_sha": "0e66db0c63f8ca348fd047275a787e07f78a6bd7",
-    "head_sha": "0e66db0c63f8ca348fd047275a787e07f78a6bd7",
+    "develop_sha": "e2e6c67f35dfe036f1bfe0e5ec6b6280b177cff3",
+    "head_sha": "e54be84c9d1c32a9e55bfd504e031b1c9d13b83f",
     "evidence": {
-      "method": "git rev-parse HEAD, develop, origin/develop; gh repo view",
-      "observed_at": "2026-09-20T12:29:12Z"
+      "method": "git rev-parse HEAD; git ls-remote origin refs/heads/develop; git merge-base HEAD e2e6c67f35dfe036f1bfe0e5ec6b6280b177cff3; gh api repos/seventwos-app/usr-workspace-ios/commits/e2e6c67f35dfe036f1bfe0e5ec6b6280b177cff3",
+      "observed_at": "2026-10-16T11:50:36Z"
     }
   },
   "upstream": {
     "repository": "element-hq/element-x-ios",
     "branch": "develop",
-    "sha": "fb49f5b83b30de8b8c52b3b467e9ca29357fc131",
+    "sha": "074a2d79106a29b85ee87e0b69e04d3703cdc6fb",
     "evidence": {
       "method": "git ls-remote https://github.com/element-hq/element-x-ios.git refs/heads/develop",
-      "observed_at": "2026-09-20T12:29:12Z"
+      "observed_at": "2026-10-16T11:50:36Z"
     }
   },
   "merge_bases": {
     "fork_head_to_fork_develop": {
-      "sha": "0e66db0c63f8ca348fd047275a787e07f78a6bd7",
+      "sha": "e2e6c67f35dfe036f1bfe0e5ec6b6280b177cff3",
       "status": "observed",
-      "evidence": "HEAD and origin/develop resolved to the same commit."
+      "evidence": "git merge-base of the observed fork head and fork develop resolved to e2e6c67f35dfe036f1bfe0e5ec6b6280b177cff3."
     },
     "fork_develop_to_upstream_develop": {
       "sha": null,
       "status": "unknown",
       "intent": "human_review_required",
-      "reason": "The local repository has no upstream remote or upstream commit object, so a merge base cannot be computed without fetching immutable upstream history."
+      "reason": "Not computed during this assessment-only ref observation refresh. Upstream candidate-change intent remains unknown; no upstream changes were applied or classified."
     }
   },
   "intent": {

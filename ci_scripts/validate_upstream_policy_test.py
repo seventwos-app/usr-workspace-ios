@@ -10,6 +10,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -21,14 +22,16 @@ SPEC.loader.exec_module(policy)
 
 
 def append_entry(previous_hash: str) -> str:
+    state = json.loads((ROOT / ".seventwos/upstream-state.json").read_text(encoding="utf-8"))
+    entries = policy.read_ledger(ROOT / ".seventwos/upstream-ledger.jsonl")
     entry = {
-        "entry_id": "0002",
-        "recorded_at": "2026-09-20T13:00:00Z",
+        "entry_id": f"{len(entries) + 1:04d}",
+        "recorded_at": state["recorded_at"],
         "event": "assessment-verified",
         "actor": "repository-maintainers",
         "inputs": {
-            "fork_develop_sha": "0e66db0c63f8ca348fd047275a787e07f78a6bd7",
-            "upstream_develop_sha": "fb49f5b83b30de8b8c52b3b467e9ca29357fc131",
+            "fork_develop_sha": state["fork"]["develop_sha"],
+            "upstream_develop_sha": state["upstream"]["sha"],
         },
         "decision": "Report-only assessment verified.",
         "previous_entry_sha256": previous_hash,
@@ -74,9 +77,11 @@ class UpstreamPolicyValidatorTests(unittest.TestCase):
             root = Path(directory)
             self.copy_repository_files(root)
             ledger = root / ".seventwos/upstream-ledger.jsonl"
-            entry = json.loads(ledger.read_text(encoding="utf-8"))
+            lines = ledger.read_text(encoding="utf-8").splitlines()
+            entry = json.loads(lines[-1])
             entry["entry_sha256"] = "0" * 64
-            ledger.write_text(json.dumps(entry) + "\n", encoding="utf-8")
+            lines[-1] = json.dumps(entry)
+            ledger.write_text("\n".join(lines) + "\n", encoding="utf-8")
             result = self.run_validator(root)
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("invalid entry_sha256", result.stderr)
@@ -125,10 +130,41 @@ class UpstreamPolicyValidatorTests(unittest.TestCase):
         with self.assertRaises(SystemExit):
             policy.validate_git_evidence(ROOT, state, False)
 
+    def test_remote_verification_requires_exact_pinned_ref(self) -> None:
         state = json.loads((ROOT / ".seventwos/upstream-state.json").read_text(encoding="utf-8"))
+        matching_ref = f"{state['upstream']['sha']}\trefs/heads/develop\n"
+        cases = (
+            (0, matching_ref, True),
+            (0, f"{'0' * 40}\trefs/heads/develop\n", False),
+            (0, f"{state['upstream']['sha']}\trefs/heads/other\n", False),
+            (0, "", False),
+            (1, "", False),
+        )
+        for returncode, stdout, valid in cases:
+            with self.subTest(returncode=returncode, stdout=stdout):
+                def git_result(root, *args):
+                    if args[0] == "ls-remote":
+                        self.assertEqual(args[1:], (
+                            "https://github.com/element-hq/element-x-ios.git",
+                            "refs/heads/develop",
+                        ))
+                        return subprocess.CompletedProcess(args, returncode, stdout, "remote error")
+                    return subprocess.CompletedProcess(args, 0, "", "")
+
+                with patch.object(policy, "run_git", side_effect=git_result):
+                    if valid:
+                        policy.validate_git_evidence(ROOT, state, True)
+                    else:
+                        with self.assertRaises(SystemExit):
+                            policy.validate_git_evidence(ROOT, state, True)
+
+    def test_refresh_requires_matching_ledger_transition(self) -> None:
+        state = json.loads((ROOT / ".seventwos/upstream-state.json").read_text(encoding="utf-8"))
+        ledger = policy.read_ledger(ROOT / ".seventwos/upstream-ledger.jsonl")
+        policy.validate_ledger_state_binding(ledger, state)
         state["upstream"]["sha"] = "0" * 40
         with self.assertRaises(SystemExit):
-            policy.validate_git_evidence(ROOT, state, True)
+            policy.validate_ledger_state_binding(ledger, state)
 
     def test_requires_base_and_rejects_ledger_rewrite_on_protected_events(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -143,7 +179,8 @@ class UpstreamPolicyValidatorTests(unittest.TestCase):
             subprocess.run(["git", "add", "."], cwd=root, check=True)
             subprocess.run(["git", "commit", "-qm", "baseline"], cwd=root, check=True)
             base = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip()
-            destination.write_text(destination.read_text(encoding="utf-8") + append_entry(json.loads(ledger.read_text())["entry_sha256"]) + "\n", encoding="utf-8")
+            latest = json.loads(ledger.read_text(encoding="utf-8").splitlines()[-1])
+            destination.write_text(destination.read_text(encoding="utf-8") + append_entry(latest["entry_sha256"]) + "\n", encoding="utf-8")
             policy.validate_ledger_base(root, destination, base, True)
             destination.write_text(destination.read_text(encoding="utf-8").replace('"entry_id":"0001"', '"entry_id":"evil"'), encoding="utf-8")
             with self.assertRaises(SystemExit):
