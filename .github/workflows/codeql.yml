@@ -14,7 +14,7 @@ jobs:
   analyze:
     name: Analyze iOS (Swift)
     runs-on: macos-26
-    timeout-minutes: 180
+    timeout-minutes: 60
     permissions:
       actions: read
       contents: read
@@ -37,6 +37,7 @@ jobs:
             -configuration Debug \
             -destination 'generic/platform=iOS Simulator' \
             -jobs 3 \
+            ARCHS=arm64 \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
             COMPILATION_CACHE_ENABLE_CACHING=NO \
