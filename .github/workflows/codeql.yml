@@ -37,8 +37,6 @@ jobs:
             -configuration Debug \
             -destination 'generic/platform=iOS Simulator' \
             -jobs 3 \
-            ARCHS=arm64 \
-            ONLY_ACTIVE_ARCH=YES \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
             COMPILATION_CACHE_ENABLE_CACHING=NO \
