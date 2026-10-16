@@ -31,11 +31,26 @@ jobs:
           build-mode: manual
       - name: Build app debug simulator variant
         run: |
+          (
+            while true; do
+              echo "::group::Build resource snapshot $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+              vm_stat
+              sysctl vm.swapusage
+              df -h "$RUNNER_TEMP"
+              ps -axo pid,ppid,%cpu,rss,etime,comm | sort -k4,4nr | sed -n '1,12p'
+              echo "::endgroup::"
+              sleep 120
+            done
+          ) &
+          monitor_pid=$!
+          trap 'kill "$monitor_pid"' EXIT
+
           xcodebuild build \
             -project Seventwos.xcodeproj \
             -scheme Seventwos \
             -configuration Debug \
-            -destination 'generic/platform=iOS Simulator' \
+            -destination 'generic/platform=iOS Simulator,arch=x86_64' \
+            -enableCodeCoverage NO \
             -jobs 2 \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
