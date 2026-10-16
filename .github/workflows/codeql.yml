@@ -28,6 +28,21 @@ jobs:
         uses: github/codeql-action/init@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4
         with:
           languages: swift
-          build-mode: autobuild
+          build-mode: manual
+      - name: Build app debug simulator variant
+        run: |
+          xcodebuild build \
+            -project Seventwos.xcodeproj \
+            -scheme Seventwos \
+            -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' \
+            -jobs 3 \
+            ARCHS=arm64 \
+            ONLY_ACTIVE_ARCH=YES \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            COMPILATION_CACHE_ENABLE_CACHING=NO \
+            SWIFT_ENABLE_COMPILE_CACHE=NO \
+            SWIFT_USE_INTEGRATED_DRIVER=NO
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4
