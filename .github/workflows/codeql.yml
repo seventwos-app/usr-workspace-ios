@@ -50,10 +50,10 @@ jobs:
             -scheme Seventwos \
             -configuration Debug \
             -destination 'generic/platform=iOS Simulator,arch=x86_64' \
-            -enableCodeCoverage NO \
             -jobs 2 \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
+            CLANG_ENABLE_CODE_COVERAGE=NO \
             ONLY_ACTIVE_ARCH=YES \
             COMPILATION_CACHE_ENABLE_CACHING=NO \
             SWIFT_ENABLE_COMPILE_CACHE=NO \
