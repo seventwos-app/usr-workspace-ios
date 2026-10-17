@@ -15,7 +15,8 @@ setup_github_actions_environment() {
     unset HOMEBREW_NO_INSTALL_FROM_API
     export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
     
-    brew update && brew install xcodegen swiftlint git-lfs pkl
+    brew update
+    brew install xcodegen swiftlint git-lfs pkl
 
     # Keep CI on the formatter used by the source tree; Homebrew upgrades can add lint rules.
     swiftformat_directory="$RUNNER_TEMP/swiftformat-0.63.1"
