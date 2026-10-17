@@ -50,7 +50,7 @@ jobs:
           monitor_pid=$!
           trap 'kill "$monitor_pid"' EXIT
 
-          xcodebuild build \
+          CODEQL_ANALYSIS=1 xcodebuild build \
             -project Seventwos.xcodeproj \
             -scheme Seventwos \
             -configuration Debug \
