@@ -136,7 +136,7 @@ struct RunTests: AsyncParsableCommand {
     private func executeXcodeBuild() async throws {
         var command = "set -o pipefail && xcodebuild test"
         command += " -scheme \(scheme)"
-        command += " -destination 'platform=iOS Simulator,name=\(device),OS=\(osVersion),arch=arm64'"
+        command += " -destination 'platform=iOS Simulator,name=\(device),OS=\(osVersion)'"
         command += " -resultBundlePath \(resultBundlePath)"
         
         // Use a dedicated compilation cache for incremental builds on CI (as Xcode's DerivedData
