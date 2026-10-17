@@ -8056,7 +8056,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which swiftlint >/dev/null; then\n    swiftlint\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "if [ \"${CODEQL_ANALYSIS:-0}\" = \"1\" ]; then\n  echo \"Skipping redundant script during CodeQL analysis\"\nelse\n  export PATH=\"$PATH:/opt/homebrew/bin\"\n  if which swiftlint >/dev/null; then\n      swiftlint\n  else\n      echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\n  fi\nfi\n";
 		};
 		53CD3FB7F4E752385E0E27D6 /* 🧙 Sourcery - Generate mocks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -8075,7 +8075,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which sourcery >/dev/null; then\n    sourcery --config Tools/Sourcery/AutoMockableConfig.yml\nelse\n    echo \"warning: Sourcery not installed, run swift run tools setup-project\"\nfi\n";
+			shellScript = "if [ \"${CODEQL_ANALYSIS:-0}\" = \"1\" ]; then\n  echo \"Skipping redundant script during CodeQL analysis\"\nelse\n  export PATH=\"$PATH:/opt/homebrew/bin\"\n  if which sourcery >/dev/null; then\n      sourcery --config Tools/Sourcery/AutoMockableConfig.yml\n  else\n      echo \"warning: Sourcery not installed, run swift run tools setup-project\"\n  fi\n\nfi\n";
 		};
 		7521A31AB234DEC1A69282B4 /* 🧙 Sourcery - Generate Accessibility Tests */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -8094,7 +8094,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which sourcery >/dev/null; then\n    sourcery --config Tools/Sourcery/TestablePreviewsDictionary.yml\n    sourcery --config Tools/Sourcery/AccessibilityTests.yml\nelse\n    echo \"warning: Sourcery not installed, run swift run tools setup-project\"\nfi\n";
+			shellScript = "if [ \"${CODEQL_ANALYSIS:-0}\" = \"1\" ]; then\n  echo \"Skipping redundant script during CodeQL analysis\"\nelse\n  export PATH=\"$PATH:/opt/homebrew/bin\"\n  if which sourcery >/dev/null; then\n      sourcery --config Tools/Sourcery/TestablePreviewsDictionary.yml\n      sourcery --config Tools/Sourcery/AccessibilityTests.yml\n  else\n      echo \"warning: Sourcery not installed, run swift run tools setup-project\"\n  fi\n\nfi\n";
 		};
 		868CB9E93B1AEC3383F71E0F /* Copy Swift Objective-C Interface Header */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -8129,7 +8129,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which sourcery >/dev/null; then\n    sourcery --config Tools/Sourcery/PreviewTestsConfig.yml\nelse\n    echo \"warning: Sourcery not installed, run swift run tools setup-project\"\nfi\n";
+			shellScript = "if [ \"${CODEQL_ANALYSIS:-0}\" = \"1\" ]; then\n  echo \"Skipping redundant script during CodeQL analysis\"\nelse\n  export PATH=\"$PATH:/opt/homebrew/bin\"\n  if which sourcery >/dev/null; then\n      sourcery --config Tools/Sourcery/PreviewTestsConfig.yml\n  else\n      echo \"warning: Sourcery not installed, run swift run tools setup-project\"\n  fi\n  \nfi\n";
 		};
 		EE78FE6F59D6707779C0ED25 /* 🧹 SwiftFormat */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -8148,7 +8148,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which swiftformat >/dev/null; then\n    swiftformat --lint --lenient \"$PROJECT_DIR\"\nelse\n    echo \"warning: SwiftFormat not installed, download from https://github.com/nicklockwood/SwiftFormat\"\nfi\n";
+			shellScript = "if [ \"${CODEQL_ANALYSIS:-0}\" = \"1\" ]; then\n  echo \"Skipping redundant script during CodeQL analysis\"\nelse\n  export PATH=\"$PATH:/opt/homebrew/bin\"\n  if which swiftformat >/dev/null; then\n      swiftformat --lint --lenient \"$PROJECT_DIR\"\n  else\n      echo \"warning: SwiftFormat not installed, download from https://github.com/nicklockwood/SwiftFormat\"\n  fi\n\nfi\n";
 		};
 		FAA5592C2C34916F59189325 /* 🛠 SwiftGen */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -8167,7 +8167,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which swiftgen >/dev/null; then\n    swiftgen config run --config Tools/SwiftGen/swiftgen-config.yml\nelse\n    echo \"warning: SwiftGen not installed, download from https://github.com/SwiftGen/SwiftGen\"\nfi\n";
+			shellScript = "if [ \"${CODEQL_ANALYSIS:-0}\" = \"1\" ]; then\n  echo \"Skipping redundant script during CodeQL analysis\"\nelse\n  export PATH=\"$PATH:/opt/homebrew/bin\"\n  if which swiftgen >/dev/null; then\n      swiftgen config run --config Tools/SwiftGen/swiftgen-config.yml\n  else\n      echo \"warning: SwiftGen not installed, download from https://github.com/SwiftGen/SwiftGen\"\n  fi\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
