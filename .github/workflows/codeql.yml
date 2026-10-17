@@ -68,7 +68,7 @@ jobs:
             -scheme Seventwos \
             -configuration Debug \
             -destination 'generic/platform=iOS Simulator' \
-            -jobs 2 \
+            -jobs 1 \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
             CLANG_ENABLE_CODE_COVERAGE=NO \
