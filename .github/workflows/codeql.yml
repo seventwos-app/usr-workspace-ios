@@ -24,6 +24,11 @@ jobs:
         with:
           lfs: true
           persist-credentials: false
+      - name: Select repository Xcode version
+        run: |
+          source ci_scripts/ci_common.sh
+          xcode_select_for_github_actions
+          xcodebuild -version
       - name: Initialize CodeQL
         uses: github/codeql-action/init@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4
         with:
