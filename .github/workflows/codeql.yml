@@ -29,6 +29,19 @@ jobs:
           source ci_scripts/ci_common.sh
           xcode_select_for_github_actions
           xcodebuild -version
+      - name: Verify checked-in generated sources
+        run: |
+          for source in \
+            Seventwos/Sources/Generated/Assets.swift \
+            Seventwos/Sources/Generated/Strings.swift \
+            Seventwos/Sources/Generated/Strings+Untranslated.swift \
+            Seventwos/Sources/Mocks/Generated/GeneratedMocks.swift \
+            Seventwos/Sources/Other/TestablePreview/TestablePreviewsDictionary.swift \
+            PreviewTests/Sources/GeneratedPreviewTests.swift \
+            AccessibilityTests/Sources/GeneratedAccessibilityTests.swift; do
+            git ls-files --error-unmatch "$source"
+            test -s "$source"
+          done
       - name: Initialize CodeQL
         uses: github/codeql-action/init@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4
         with:
