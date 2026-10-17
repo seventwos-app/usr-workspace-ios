@@ -10,7 +10,7 @@ permissions:
 # Patch bumps are handled by the release script.
 jobs:
   automatic-calendar-version:
-    runs-on: macos-26
+    runs-on: macos-26-intel
     timeout-minutes: 15
 
     if: github.repository == 'seventwos-app/usr-workspace-ios'
