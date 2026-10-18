@@ -191,6 +191,28 @@ def permission_map_is_read_only(value: Any) -> bool:
     return isinstance(value, dict) and value == {"contents": "read"}
 
 
+def validate_pull_request_scope(workflow: dict[str, Any]) -> None:
+    triggers = workflow.get("on")
+    if not isinstance(triggers, dict) or "pull_request" not in triggers:
+        fail("assessment workflow must trigger on pull_request")
+    jobs = workflow.get("jobs")
+    steps = jobs.get("assess", {}).get("steps") if isinstance(jobs, dict) else None
+    if not isinstance(steps, list):
+        fail("assessment workflow must define assess job steps")
+    scope_index = next(
+        (index for index, step in enumerate(steps) if isinstance(step, dict) and step.get("id") == "scope"),
+        None,
+    )
+    if scope_index is None:
+        fail("unfiltered pull_request trigger requires a scope step")
+    scope_run = steps[scope_index].get("run")
+    if not isinstance(scope_run, str) or any(f'"{path}"' not in scope_run for path in POLICY_TRIGGER_PATHS):
+        fail("pull_request scope step must cover every policy-owned path")
+    for step in steps[scope_index + 1:]:
+        if not isinstance(step, dict) or step.get("if") != "steps.scope.outputs.relevant == 'true'":
+            fail("steps after the pull_request scope step must be gated on its result")
+
+
 def validate_workflow(root: Path, state: dict[str, Any]) -> None:
     workflow = read_yaml(root / POLICY_WORKFLOW_PATH)
     triggers = workflow.get("on")
@@ -198,6 +220,11 @@ def validate_workflow(root: Path, state: dict[str, Any]) -> None:
         fail("assessment workflow must define structured triggers")
     for trigger in ("pull_request", "push"):
         config = triggers.get(trigger)
+        if trigger == "pull_request" and trigger in triggers and config in (None, ""):
+            # `assess` is a required check, so pull requests may run unfiltered
+            # provided the job scopes validation to every policy-owned path.
+            validate_pull_request_scope(workflow)
+            continue
         if not isinstance(config, dict):
             fail(f"assessment workflow must trigger on {trigger}")
         paths = config.get("paths")
