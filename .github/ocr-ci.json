@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "execution": "central-only",
+  "controller_repository": "seventwos-app/agent-control-plane",
+  "controller_workflow": ".github/workflows/ocr-central.yml",
+  "provider_credentials_in_repository": false,
+  "activation": "requires-separate-authorization"
+}
