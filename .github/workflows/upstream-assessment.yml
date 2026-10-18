@@ -6,14 +6,12 @@ name: Upstream Assessment
 # below together. Run the validator/tests and --verify-remote before pushing.
 # A later upstream advance deliberately fails closed; repeat the evidence-backed
 # refresh rather than disabling remote equality or adopting upstream content.
+#
+# `assess` is a required status check, so pull requests always run this job.
+# Policy validation runs only when policy-scoped paths change; otherwise the
+# job reports success without contacting upstream.
 on:
   pull_request:
-    paths:
-      - ".seventwos/**"
-      - "ci_scripts/validate_upstream_policy.py"
-      - "ci_scripts/validate_upstream_policy_test.py"
-      - ".github/workflows/upstream-assessment.yml"
-      - "CODEOWNERS"
   push:
     branches:
       - develop
@@ -58,10 +56,36 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
+      - name: Detect policy-scoped changes
+        id: scope
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -eu
+          if [ "$EVENT_NAME" != "pull_request" ]; then
+            echo "relevant=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if ! git diff --quiet "$BASE_SHA...$HEAD_SHA" -- \
+            ".seventwos/**" \
+            "ci_scripts/validate_upstream_policy.py" \
+            "ci_scripts/validate_upstream_policy_test.py" \
+            ".github/workflows/upstream-assessment.yml" \
+            "CODEOWNERS"; then
+            echo "relevant=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "relevant=false" >> "$GITHUB_OUTPUT"
+            echo "No policy-scoped paths changed; upstream assessment not required."
+          fi
+
       - name: Install policy validator dependency
+        if: steps.scope.outputs.relevant == 'true'
         run: python3 -m pip install --disable-pip-version-check PyYAML==6.0.2
 
       - name: Validate immutable inputs and policy
+        if: steps.scope.outputs.relevant == 'true'
         env:
           FORK_SHA: ${{ inputs.fork_sha || '35f475851662c071b4481795802e827862d5dbf3' }}
           MODE: ${{ inputs.mode || 'assess_only' }}
@@ -87,6 +111,7 @@ jobs:
           PY
 
       - name: Produce read-only assessment report
+        if: steps.scope.outputs.relevant == 'true'
         env:
           FORK_SHA: ${{ inputs.fork_sha }}
           UPSTREAM_SHA: ${{ inputs.upstream_sha }}
@@ -107,7 +132,8 @@ jobs:
           }, indent=2) + "\n", encoding="utf-8")
           PY
 
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - if: steps.scope.outputs.relevant == 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: upstream-assessment-report
           path: upstream-assessment-report.json

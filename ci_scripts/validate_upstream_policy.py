@@ -46,6 +46,30 @@ POLICY_TRIGGER_PATHS = {
     ".github/workflows/upstream-assessment.yml",
     "CODEOWNERS",
 }
+# The pull_request scope step must match exactly so policy paths cannot be
+# dropped from the diff while still appearing elsewhere (for example, comments).
+POLICY_SCOPE_ENV = {
+    "EVENT_NAME": "${{ github.event_name }}",
+    "BASE_SHA": "${{ github.event.pull_request.base.sha }}",
+    "HEAD_SHA": "${{ github.event.pull_request.head.sha }}",
+}
+POLICY_SCOPE_RUN = """set -eu
+if [ "$EVENT_NAME" != "pull_request" ]; then
+  echo "relevant=true" >> "$GITHUB_OUTPUT"
+  exit 0
+fi
+if ! git diff --quiet "$BASE_SHA...$HEAD_SHA" -- \\
+  ".seventwos/**" \\
+  "ci_scripts/validate_upstream_policy.py" \\
+  "ci_scripts/validate_upstream_policy_test.py" \\
+  ".github/workflows/upstream-assessment.yml" \\
+  "CODEOWNERS"; then
+  echo "relevant=true" >> "$GITHUB_OUTPUT"
+else
+  echo "relevant=false" >> "$GITHUB_OUTPUT"
+  echo "No policy-scoped paths changed; upstream assessment not required."
+fi
+"""
 
 
 def fail(message: str) -> None:
@@ -191,6 +215,32 @@ def permission_map_is_read_only(value: Any) -> bool:
     return isinstance(value, dict) and value == {"contents": "read"}
 
 
+def validate_pull_request_scope(workflow: dict[str, Any]) -> None:
+    triggers = workflow.get("on")
+    if not isinstance(triggers, dict) or "pull_request" not in triggers:
+        fail("assessment workflow must trigger on pull_request")
+    jobs = workflow.get("jobs")
+    steps = jobs.get("assess", {}).get("steps") if isinstance(jobs, dict) else None
+    if not isinstance(steps, list):
+        fail("assessment workflow must define assess job steps")
+    scope_index = next(
+        (index for index, step in enumerate(steps) if isinstance(step, dict) and step.get("id") == "scope"),
+        None,
+    )
+    if scope_index is None:
+        fail("unfiltered pull_request trigger requires a scope step")
+    scope_step = steps[scope_index]
+    if set(scope_step) != {"name", "id", "env", "run"}:
+        fail("pull_request scope step must run unconditionally with only name, id, env, and run")
+    if scope_step.get("env") != POLICY_SCOPE_ENV or scope_step.get("run") != POLICY_SCOPE_RUN:
+        fail("pull_request scope step must cover every policy-owned path with the canonical script")
+    for step in steps[scope_index + 1:]:
+        if not isinstance(step, dict) or step.get("if") != "steps.scope.outputs.relevant == 'true'":
+            fail("steps after the pull_request scope step must be gated on its result")
+        if "continue-on-error" in step:
+            fail("steps after the pull_request scope step must not continue on error")
+
+
 def validate_workflow(root: Path, state: dict[str, Any]) -> None:
     workflow = read_yaml(root / POLICY_WORKFLOW_PATH)
     triggers = workflow.get("on")
@@ -198,6 +248,11 @@ def validate_workflow(root: Path, state: dict[str, Any]) -> None:
         fail("assessment workflow must define structured triggers")
     for trigger in ("pull_request", "push"):
         config = triggers.get(trigger)
+        if trigger == "pull_request" and trigger in triggers and config in (None, ""):
+            # `assess` is a required check, so pull requests may run unfiltered
+            # provided the job scopes validation to every policy-owned path.
+            validate_pull_request_scope(workflow)
+            continue
         if not isinstance(config, dict):
             fail(f"assessment workflow must trigger on {trigger}")
         paths = config.get("paths")
