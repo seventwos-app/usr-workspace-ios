@@ -150,73 +150,97 @@ targets:
       basedOnDependencyAnalysis: false
       shell: /bin/sh
       script: |
-        export PATH="$PATH:/opt/homebrew/bin"
-        if which swiftgen >/dev/null; then
-            swiftgen config run --config Tools/SwiftGen/swiftgen-config.yml
+        if [ "${CODEQL_ANALYSIS:-0}" = "1" ]; then
+          echo "Skipping redundant script during CodeQL analysis"
         else
-            echo "warning: SwiftGen not installed, download from https://github.com/SwiftGen/SwiftGen"
+          export PATH="$PATH:/opt/homebrew/bin"
+          if which swiftgen >/dev/null; then
+              swiftgen config run --config Tools/SwiftGen/swiftgen-config.yml
+          else
+              echo "warning: SwiftGen not installed, download from https://github.com/SwiftGen/SwiftGen"
+          fi
         fi
     - name: 🧙 Sourcery - Generate mocks
       runOnlyWhenInstalling: false
       basedOnDependencyAnalysis: false
       shell: /bin/sh
       script: |
-        export PATH="$PATH:/opt/homebrew/bin"
-        if which sourcery >/dev/null; then
-            sourcery --config Tools/Sourcery/AutoMockableConfig.yml
+        if [ "${CODEQL_ANALYSIS:-0}" = "1" ]; then
+          echo "Skipping redundant script during CodeQL analysis"
         else
-            echo "warning: Sourcery not installed, run swift run tools setup-project"
-        fi
+          export PATH="$PATH:/opt/homebrew/bin"
+          if which sourcery >/dev/null; then
+              sourcery --config Tools/Sourcery/AutoMockableConfig.yml
+          else
+              echo "warning: Sourcery not installed, run swift run tools setup-project"
+          fi
 
+        fi
     - name: 🧙 Sourcery - Generate preview tests
       runOnlyWhenInstalling: false
       basedOnDependencyAnalysis: false
       shell: /bin/sh
       script: |
-        export PATH="$PATH:/opt/homebrew/bin"
-        if which sourcery >/dev/null; then
-            sourcery --config Tools/Sourcery/PreviewTestsConfig.yml
+        if [ "${CODEQL_ANALYSIS:-0}" = "1" ]; then
+          echo "Skipping redundant script during CodeQL analysis"
         else
-            echo "warning: Sourcery not installed, run swift run tools setup-project"
+          export PATH="$PATH:/opt/homebrew/bin"
+          if which sourcery >/dev/null; then
+              sourcery --config Tools/Sourcery/PreviewTestsConfig.yml
+          else
+              echo "warning: Sourcery not installed, run swift run tools setup-project"
+          fi
+          
         fi
-        
     - name: 🧙 Sourcery - Generate Accessibility Tests
       runOnlyWhenInstalling: false
       basedOnDependencyAnalysis: false
       shell: /bin/sh
       script: |
-        export PATH="$PATH:/opt/homebrew/bin"
-        if which sourcery >/dev/null; then
-            sourcery --config Tools/Sourcery/TestablePreviewsDictionary.yml
-            sourcery --config Tools/Sourcery/AccessibilityTests.yml
+        if [ "${CODEQL_ANALYSIS:-0}" = "1" ]; then
+          echo "Skipping redundant script during CodeQL analysis"
         else
-            echo "warning: Sourcery not installed, run swift run tools setup-project"
-        fi
+          export PATH="$PATH:/opt/homebrew/bin"
+          if which sourcery >/dev/null; then
+              sourcery --config Tools/Sourcery/TestablePreviewsDictionary.yml
+              sourcery --config Tools/Sourcery/AccessibilityTests.yml
+          else
+              echo "warning: Sourcery not installed, run swift run tools setup-project"
+          fi
 
+        fi
     postBuildScripts:
     - name: ⚠️ SwiftLint
       runOnlyWhenInstalling: false
       basedOnDependencyAnalysis: false
       shell: /bin/sh
       script: |
-        export PATH="$PATH:/opt/homebrew/bin"
-        if which swiftlint >/dev/null; then
-            swiftlint
+        if [ "${CODEQL_ANALYSIS:-0}" = "1" ]; then
+          echo "Skipping redundant script during CodeQL analysis"
         else
-            echo "warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint"
+          export PATH="$PATH:/opt/homebrew/bin"
+          if which swiftlint >/dev/null; then
+              swiftlint
+          else
+              echo "warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint"
+          fi
         fi
     - name: 🧹 SwiftFormat
       runOnlyWhenInstalling: false
       basedOnDependencyAnalysis: false
       shell: /bin/sh
       script: |
-        export PATH="$PATH:/opt/homebrew/bin"
-        if which swiftformat >/dev/null; then
-            swiftformat --lint --lenient "$PROJECT_DIR"
+        if [ "${CODEQL_ANALYSIS:-0}" = "1" ]; then
+          echo "Skipping redundant script during CodeQL analysis"
         else
-            echo "warning: SwiftFormat not installed, download from https://github.com/nicklockwood/SwiftFormat"
-        fi
+          export PATH="$PATH:/opt/homebrew/bin"
+          if which swiftformat >/dev/null; then
+              swiftformat --lint --lenient "$PROJECT_DIR"
+          else
+              echo "warning: SwiftFormat not installed, download from https://github.com/nicklockwood/SwiftFormat"
+          fi
 
+        fi
     dependencies:
     - target: NSE
     - target: ShareExtension

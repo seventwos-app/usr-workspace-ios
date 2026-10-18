@@ -1,30 +1,30 @@
 {
   "schema_version": 1,
-  "recorded_at": "2026-10-16T11:50:36Z",
+  "recorded_at": "2026-10-16T17:20:54Z",
   "fork": {
     "repository": "seventwos-app/usr-workspace-ios",
     "default_branch": "develop",
-    "develop_sha": "e2e6c67f35dfe036f1bfe0e5ec6b6280b177cff3",
-    "head_sha": "e54be84c9d1c32a9e55bfd504e031b1c9d13b83f",
+    "develop_sha": "35f475851662c071b4481795802e827862d5dbf3",
+    "head_sha": "53dca17a41e07b138fa2c99a3ef6f0e8de768b42",
     "evidence": {
-      "method": "git rev-parse HEAD; git ls-remote origin refs/heads/develop; git merge-base HEAD e2e6c67f35dfe036f1bfe0e5ec6b6280b177cff3; gh api repos/seventwos-app/usr-workspace-ios/commits/e2e6c67f35dfe036f1bfe0e5ec6b6280b177cff3",
-      "observed_at": "2026-10-16T11:50:36Z"
+      "method": "git rev-parse HEAD; git ls-remote origin refs/heads/develop; git merge-base HEAD 35f475851662c071b4481795802e827862d5dbf3; git merge-base --is-ancestor 35f475851662c071b4481795802e827862d5dbf3 HEAD",
+      "observed_at": "2026-10-16T17:20:54Z"
     }
   },
   "upstream": {
     "repository": "element-hq/element-x-ios",
     "branch": "develop",
-    "sha": "074a2d79106a29b85ee87e0b69e04d3703cdc6fb",
+    "sha": "734c0678fa2affe485746126458fca888639e608",
     "evidence": {
       "method": "git ls-remote https://github.com/element-hq/element-x-ios.git refs/heads/develop",
-      "observed_at": "2026-10-16T11:50:36Z"
+      "observed_at": "2026-10-16T17:20:54Z"
     }
   },
   "merge_bases": {
     "fork_head_to_fork_develop": {
-      "sha": "e2e6c67f35dfe036f1bfe0e5ec6b6280b177cff3",
+      "sha": "35f475851662c071b4481795802e827862d5dbf3",
       "status": "observed",
-      "evidence": "git merge-base of the observed fork head and fork develop resolved to e2e6c67f35dfe036f1bfe0e5ec6b6280b177cff3."
+      "evidence": "git merge-base of the observed fork head and fork develop resolved to 35f475851662c071b4481795802e827862d5dbf3; git merge-base --is-ancestor confirmed fork develop is an ancestor of HEAD."
     },
     "fork_develop_to_upstream_develop": {
       "sha": null,
