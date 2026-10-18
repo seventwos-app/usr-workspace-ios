@@ -137,6 +137,21 @@ class UpstreamPolicyValidatorTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("scope step must cover", result.stderr)
 
+    def test_rejects_pull_request_scope_path_only_in_comment(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.copy_repository_files(root)
+            workflow = root / ".github/workflows/upstream-assessment.yml"
+            content = workflow.read_text(encoding="utf-8").replace(
+                '            "CODEOWNERS"; then\n',
+                '            "README.md"; then\n            # "CODEOWNERS"\n',
+                1,
+            )
+            workflow.write_text(content, encoding="utf-8")
+            result = self.run_validator(root)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("scope step must cover", result.stderr)
+
     def test_rejects_ungated_step_after_pull_request_scope(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

@@ -46,6 +46,30 @@ POLICY_TRIGGER_PATHS = {
     ".github/workflows/upstream-assessment.yml",
     "CODEOWNERS",
 }
+# The pull_request scope step must match exactly so policy paths cannot be
+# dropped from the diff while still appearing elsewhere (for example, comments).
+POLICY_SCOPE_ENV = {
+    "EVENT_NAME": "${{ github.event_name }}",
+    "BASE_SHA": "${{ github.event.pull_request.base.sha }}",
+    "HEAD_SHA": "${{ github.event.pull_request.head.sha }}",
+}
+POLICY_SCOPE_RUN = """set -eu
+if [ "$EVENT_NAME" != "pull_request" ]; then
+  echo "relevant=true" >> "$GITHUB_OUTPUT"
+  exit 0
+fi
+if ! git diff --quiet "$BASE_SHA...$HEAD_SHA" -- \\
+  ".seventwos/**" \\
+  "ci_scripts/validate_upstream_policy.py" \\
+  "ci_scripts/validate_upstream_policy_test.py" \\
+  ".github/workflows/upstream-assessment.yml" \\
+  "CODEOWNERS"; then
+  echo "relevant=true" >> "$GITHUB_OUTPUT"
+else
+  echo "relevant=false" >> "$GITHUB_OUTPUT"
+  echo "No policy-scoped paths changed; upstream assessment not required."
+fi
+"""
 
 
 def fail(message: str) -> None:
@@ -205,9 +229,9 @@ def validate_pull_request_scope(workflow: dict[str, Any]) -> None:
     )
     if scope_index is None:
         fail("unfiltered pull_request trigger requires a scope step")
-    scope_run = steps[scope_index].get("run")
-    if not isinstance(scope_run, str) or any(f'"{path}"' not in scope_run for path in POLICY_TRIGGER_PATHS):
-        fail("pull_request scope step must cover every policy-owned path")
+    scope_step = steps[scope_index]
+    if scope_step.get("env") != POLICY_SCOPE_ENV or scope_step.get("run") != POLICY_SCOPE_RUN:
+        fail("pull_request scope step must cover every policy-owned path with the canonical script")
     for step in steps[scope_index + 1:]:
         if not isinstance(step, dict) or step.get("if") != "steps.scope.outputs.relevant == 'true'":
             fail("steps after the pull_request scope step must be gated on its result")
