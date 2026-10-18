@@ -52,6 +52,40 @@ class CodeQLBuildSettingsTests(unittest.TestCase):
         self.assertIn("expected only x86_64", result.stderr)
 
     @unittest.skipIf(os.name == "nt", "Requires the macOS/Linux Bash execution environment")
+    def test_wrapper_preserves_toolchain_discovery(self):
+        workflow = WORKFLOW.read_text(encoding="utf-8")
+        start = workflow.index('          CODEQL_REAL_SWIFTC="$(xcrun --find swiftc)"')
+        end = workflow.index("\n      - name: Initialize CodeQL", start)
+        script = "\n".join(line[10:] for line in workflow[start:end].splitlines())
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            toolchain = root / "toolchain/usr"
+            (toolchain / "bin").mkdir(parents=True)
+            (toolchain / "lib").mkdir()
+            (toolchain / "share/swift").mkdir(parents=True)
+            features = toolchain / "share/swift/features.json"
+            features.write_text('{"features": ["package-name-if-supported"]}', encoding="utf-8")
+            compiler = toolchain / "bin/swiftc"
+            compiler.write_text("#!/bin/bash\necho 'test compiler'\n", encoding="utf-8")
+            compiler.chmod(0o755)
+            env = {
+                **os.environ,
+                "RUNNER_TEMP": directory,
+                "GITHUB_ENV": str(root / "env"),
+            }
+            prelude = f'xcrun() {{ printf "%s\\n" "{compiler}"; }}\n'
+            subprocess.run(
+                ["bash", "-eu", "-c", prelude + script],
+                cwd=ROOT,
+                env=env,
+                check=True,
+                capture_output=True,
+            )
+            wrapper_usr = root / "codeql-swiftc"
+            self.assertEqual((wrapper_usr / "share/swift/features.json").read_bytes(), features.read_bytes())
+            self.assertEqual((wrapper_usr / "lib").resolve(), (toolchain / "lib").resolve())
+
+    @unittest.skipIf(os.name == "nt", "Requires the macOS/Linux Bash execution environment")
     def test_driver_cap_follows_xcode_arguments(self):
         wrapper = ROOT / "ci_scripts/codeql_swiftc.sh"
         env = {**os.environ, "CODEQL_REAL_SWIFTC": "/usr/bin/printf"}

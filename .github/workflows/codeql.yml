@@ -90,10 +90,17 @@ jobs:
           # Xcode appends its CPU-derived -j flag after OTHER_SWIFT_FLAGS.
           # A custom driver forwards the full invocation and appends the cap last.
           CODEQL_REAL_SWIFTC="$(xcrun --find swiftc)"
-          CODEQL_SWIFT_EXEC="$RUNNER_TEMP/codeql-swiftc/swiftc"
+          CODEQL_SWIFT_EXEC="$RUNNER_TEMP/codeql-swiftc/bin/swiftc"
+          toolchain_usr="$(dirname "$(dirname "$CODEQL_REAL_SWIFTC")")"
+          test -s "$toolchain_usr/share/swift/features.json"
           mkdir -p "$(dirname "$CODEQL_SWIFT_EXEC")"
+          # Xcode discovers compiler features and host libraries relative to swiftc.
+          ln -s "$toolchain_usr/share" "$RUNNER_TEMP/codeql-swiftc/share"
+          ln -s "$toolchain_usr/lib" "$RUNNER_TEMP/codeql-swiftc/lib"
           cp ci_scripts/codeql_swiftc.sh "$CODEQL_SWIFT_EXEC"
           chmod +x "$CODEQL_SWIFT_EXEC"
+          cmp "$toolchain_usr/share/swift/features.json" \
+            "$RUNNER_TEMP/codeql-swiftc/share/swift/features.json"
           echo "CODEQL_REAL_SWIFTC=$CODEQL_REAL_SWIFTC" >> "$GITHUB_ENV"
           echo "CODEQL_SWIFT_EXEC=$CODEQL_SWIFT_EXEC" >> "$GITHUB_ENV"
           CODEQL_REAL_SWIFTC="$CODEQL_REAL_SWIFTC" "$CODEQL_SWIFT_EXEC" --version
