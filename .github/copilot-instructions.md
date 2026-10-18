@@ -21,3 +21,27 @@ Follow [Autonomous review and separation of duties](instructions/autonomous-revi
 - Parallelize only independent work with non-overlapping write ownership. Keep a continuous investigation with one owner; do not duplicate a delegate's search or implementation. Use background agents only while doing independent work, and collect their result without polling.
 - Batch related edits and review feedback. Run the smallest relevant validation; expand only when risk or failures justify it. Do not add a second review tool merely because it is available, retry CI blindly, or treat an installed skill/agent as proof that it runs in CI.
 - The coordinating agent owns integration, verifies acceptance evidence, and reports what changed, what remains blocked, and whether the result is merged. Instruction files guide compatible agents; they do not guarantee every tool loads them.
+
+## Engineering discipline routing
+
+Apply these skills only during the matching phase, within the current agent's
+existing role and permissions. Load through the client's skill tool when
+available, or read the linked document as a reference; never claim a tool ran
+when it did not. Existing workflow routers, authorization, read-only boundaries,
+specialist review gates, model settings, and publishing rules remain unchanged.
+Skip duplicate process when an existing workflow already supplies the evidence.
+
+| Current work | Skill | Relevant owners |
+|---|---|---|
+| Features, bugs, performance, tests, evaluations | [evidence-first-engineering](skills/evidence-first-engineering/SKILL.md) | Implementing, infrastructure, data, and test specialists |
+| Specs, interfaces, architectural trade-offs | [decision-and-design](skills/decision-and-design/SKILL.md) | Architect, planner, and implementing specialist |
+| Claims, research, durable docs, instruction changes, conflicting sources | [artifact-integrity](skills/artifact-integrity/SKILL.md) | Reviewers, researchers, fact checkers, writers, and task owner |
+| Resume, transfer, blocked work, recurring-failure lessons | [durable-agent-handoff](skills/durable-agent-handoff/SKILL.md) | Current task owner |
+
+Routine acknowledgements and direct one-command lookups need none of these.
+Read-only reviewers assess and report evidence; they do not gain edit or
+execution authority. These skills do not authorize deployments or publishing.
+See the [pinned mirror manifest](skills/engineering-pack.lock.json) for the
+authoritative source and digests, and [behavior scenarios](skills/engineering-scenarios.json)
+for expected and forbidden behavior. File presence, valid structure, actual
+activation, and improved outcomes are separate claims.

@@ -272,3 +272,13 @@ Follow `.github/agents/_shared_safety_blocks.md#recovery-strategy`.
 1. If two consecutive attempts fail on the same root cause, stop iterating.
 2. Summarize what was tried and why it failed.
 3. Escalate rather than looping.
+
+## Engineering discipline skills
+
+Apply the [phase-based engineering skills](../copilot-instructions.md#engineering-discipline-routing)
+when relevant to this role: evidence-first-engineering for implementation and
+validation, decision-and-design for specifications and interfaces,
+artifact-integrity for claims and durable documents, and durable-agent-handoff
+for resuming or transferring work. Load only the current phase's skill; skip
+trivial requests and duplicate process. This does not expand this agent's tools,
+scope, write access, model settings, or authorization, or replace specialist gates.

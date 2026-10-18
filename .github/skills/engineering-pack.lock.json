@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "sourceRepository": "seventwos-app/our_partner_success_platform",
+  "sourceRevision": "891082c128cf664af0beedcd260967cd66e146fb",
+  "maintenance": "Versioned mirror. Edit the source repository, then explicitly refresh and verify digests.",
+  "sha256": {
+    ".github/skills/artifact-integrity/SKILL.md": "846971124598147445d4612f9b8e2bc626d378d17b651cdc356bb031f2b16781",
+    ".github/skills/decision-and-design/SKILL.md": "235cad2c5da4627c2d3b73242721159674dccb659b33cda4dae50045d5ce730c",
+    ".github/skills/durable-agent-handoff/SKILL.md": "8eda60451ac7bfad3d6d5ae6497fc3e2429d7ab9d3ba9500ab62b732bfe06f16",
+    ".github/skills/engineering-scenarios.json": "74d5d2c0dc38662aed28258a73ee41bc8eb552c88ee4b82bdfac82696070bf93",
+    ".github/skills/evidence-first-engineering/SKILL.md": "1a89dbcfae69f4198ccef855a332f44559a5337c52169cd4f86d8099ad5c41f4",
+    ".github/skills/artifact-integrity/THIRD_PARTY_NOTICES.txt": "0e96f5893d8f9040c513f649d1b8f06cf3b489fde0f9214a6b3c12c059d675f1",
+    ".github/skills/decision-and-design/THIRD_PARTY_NOTICES.txt": "0e96f5893d8f9040c513f649d1b8f06cf3b489fde0f9214a6b3c12c059d675f1",
+    ".github/skills/durable-agent-handoff/THIRD_PARTY_NOTICES.txt": "0e96f5893d8f9040c513f649d1b8f06cf3b489fde0f9214a6b3c12c059d675f1",
+    ".github/skills/evidence-first-engineering/THIRD_PARTY_NOTICES.txt": "0e96f5893d8f9040c513f649d1b8f06cf3b489fde0f9214a6b3c12c059d675f1"
+  }
+}
