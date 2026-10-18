@@ -18,6 +18,13 @@ source-build/signing proof workflow.
 
 ## Configuration and activation
 
+**Activation is blocked by an unresolved credential boundary.** A trusted-base
+checkout protects the helper, not the `pull_request` workflow definition. An
+eligible same-repository PR can modify that definition. Do not configure provider
+secrets or enable execution under this design. A separately reviewed trusted
+execution and credential-release mechanism is required first; the author filter
+and read-only GitHub token do not solve this problem.
+
 Installation is not activation or review evidence. An authorized administrator
 must approve the provider, sending repository content to it and recurring
 usage/spending before setting repository variable `OCR_CI_ENABLED=true`.
@@ -34,8 +41,10 @@ Configure these in GitHub Actions settings, never in source or chat:
 | Variable | `OCR_LLM_PROTOCOL` | `openai`, `openai-responses` or `anthropic` |
 | Variable | `OCR_CI_ENABLED` | Exact string `true` only after activation authorization |
 
-Use selected-repository organization secrets where available, otherwise scoped
-repository secrets. Do not reuse unrelated audit credentials or Azure identities.
+The table specifies the expected interface, not permission to store credentials.
+Repository or organization secrets accessible to PR-modified workflows do not
+satisfy the unresolved credential boundary. Do not reuse unrelated audit
+credentials or Azure identities.
 Managed-identity authentication requires an approved CI identity integration;
 storing an expiring Azure access token is not a durable substitute.
 
@@ -51,6 +60,9 @@ the PR's objects with a temporary read credential, verifies the exact head and
 computes the merge-base. It never checks out the head or runs target builds,
 tests, package scripts or commands. Installation of the pinned upstream npm
 package occurs separately outside the source tree, without provider credentials.
+Its checked-in npm lockfile pins integrity hashes for the launcher and all six
+platform packages. `npm ci --ignore-scripts` installs only the lockfile contents;
+package lifecycle scripts are not executed.
 
 OCR receives only its allowlisted provider environment and a temporary HOME.
 The GitHub token and unrelated environment secrets are not passed to OCR.
@@ -78,7 +90,10 @@ These are workload controls, **not** a hard dollar cap or aggregate spending
 limit. Configure provider-side budgets/rate limits before activation.
 
 Incomplete, budget-exhausted, malformed, wrong-range and nonzero-exit results
-fail closed. Success means coverage of OCR's selected range, not every repository
+fail closed. The shared bounded JSON parser rejects duplicate keys, non-finite
+constants, excessive nesting and excessive node counts. An explicit
+`comments: null` is a valid upstream clean representation; a missing or malformed
+comments field still fails. Success means coverage of OCR's selected range, not every repository
 file, proven model quality or absence of vulnerabilities. Skips and missing
 configuration are not clean reviews.
 

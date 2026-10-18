@@ -1,0 +1,8 @@
+{
+  "name": "repository-ocr-ci",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@alibaba-group/open-code-review": "1.13.0"
+  }
+}

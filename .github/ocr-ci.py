@@ -82,7 +82,10 @@ def run(command, environment, stdout, stderr):
 
 def summary(document, base, head, exit_code):
     require(isinstance(document, dict))
-    comments = document.get("comments")
+    require("comments" in document)
+    comments = document["comments"]
+    if comments is None:
+        comments = []
     require(isinstance(comments, list) and len(comments) <= 10000
             and all(isinstance(item, dict) for item in comments))
     evidence.check_ocr(document, base, head, exit_code)
@@ -123,7 +126,7 @@ def review():
             output.seek(0)
             raw = output.read(LIMIT + 1)
             require(len(raw) <= LIMIT)
-            result = summary(json.loads(raw, object_pairs_hook=evidence.unique), base, head, code)
+            result = summary(evidence.parse(raw), base, head, code)
             print(json.dumps(result, sort_keys=True))
             path = os.environ.get("GITHUB_STEP_SUMMARY")
             if path:
@@ -149,7 +152,7 @@ def main():
             fetch()
         else:
             review()
-    except (ValueError, KeyError, OSError, subprocess.SubprocessError):
+    except (ValueError, KeyError, OSError, RecursionError, subprocess.SubprocessError):
         print("::error::OCR CI " + stage + " failed or produced incomplete evidence. "
               "Raw output was withheld; no complete review is claimed.")
         return 1

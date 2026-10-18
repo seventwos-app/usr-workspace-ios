@@ -34,9 +34,10 @@ jobs:
           OCR_LLM_PROTOCOL: ${{ vars.OCR_LLM_PROTOCOL }}
         run: python3 -I trusted/.github/ocr-ci.py validate
       - name: Install pinned upstream CLI outside the source tree
-        working-directory: ${{ runner.temp }}
-        run: >-
-          npm install --prefix "$RUNNER_TEMP/ocr-cli" --no-audit --no-fund @alibaba-group/open-code-review@1.13.0
+        run: |
+          mkdir -p "$RUNNER_TEMP/ocr-cli"
+          cp trusted/.github/security-review/ocr-cli/package{,-lock}.json "$RUNNER_TEMP/ocr-cli/"
+          npm ci --prefix "$RUNNER_TEMP/ocr-cli" --no-audit --no-fund --ignore-scripts
       - name: Fetch and verify immutable PR objects without a head checkout
         id: range
         env:
