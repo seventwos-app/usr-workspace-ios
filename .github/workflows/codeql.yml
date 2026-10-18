@@ -41,9 +41,13 @@ jobs:
           done
       - name: Verify resolved simulator architectures
         run: |
+          python3 -B ci_scripts/codeql_build_settings_test.py
           CODEQL_XCCONFIG="$(mktemp -d "$RUNNER_TEMP/codeql.XXXXXX")/simulator.xcconfig"
           # Conditional build settings must be parsed as xcconfig, not CLI assignments.
-          printf '%s\n' 'EXCLUDED_ARCHS[sdk=iphonesimulator*] = arm64' > "$CODEQL_XCCONFIG"
+          # xcodebuild -jobs limits targets, not the Swift driver's frontend jobs.
+          printf '%s\n' \
+            'EXCLUDED_ARCHS[sdk=iphonesimulator*] = arm64' \
+            'OTHER_SWIFT_FLAGS = $(inherited) -j1' > "$CODEQL_XCCONFIG"
           echo "CODEQL_XCCONFIG=$CODEQL_XCCONFIG" >> "$GITHUB_ENV"
           CODEQL_ANALYSIS=1 xcodebuild \
             -project Seventwos.xcodeproj \
@@ -80,6 +84,9 @@ jobs:
               print(f"{name}: ARCHS={sorted(architectures)}, EXCLUDED_ARCHS={sorted(excluded)}")
               if effective != {"x86_64"} or "arm64" not in excluded:
                   sys.exit(f"{name}: expected only x86_64 after SDK-scoped exclusions, got {sorted(effective)}")
+              swift_flags = settings.get("OTHER_SWIFT_FLAGS", "").split()
+              if "-j1" not in swift_flags:
+                  sys.exit(f"{name}: missing Swift driver concurrency cap in {swift_flags}")
               simulator_targets.add(name)
           if "Seventwos" not in simulator_targets:
               sys.exit("Missing resolved simulator settings for the Seventwos app")
