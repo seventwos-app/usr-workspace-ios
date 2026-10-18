@@ -1,10 +1,6 @@
 {
   "name": "OpenCodeReview PR review",
-  "on": {
-    "pull_request_target": {
-      "types": ["opened", "synchronize", "reopened", "ready_for_review"]
-    }
-  },
+  "on": {"pull_request": {"types": ["opened", "synchronize", "reopened", "ready_for_review"]}},
   "permissions": {"contents": "read"},
   "concurrency": {
     "group": "ocr-pr-review-${{ github.event.pull_request.number }}",
@@ -12,45 +8,57 @@
   },
   "jobs": {
     "review": {
-      "if": "${{ vars.OCR_CI_ENABLED == 'true' && !github.event.pull_request.draft && contains(fromJSON('[\"OWNER\",\"MEMBER\",\"COLLABORATOR\"]'), github.event.pull_request.author_association) }}",
+      "if": "${{ vars.OCR_CI_ENABLED == 'true' && github.event.pull_request.head.repo.full_name == github.repository && !github.event.pull_request.draft && contains(fromJSON('[\"OWNER\",\"MEMBER\",\"COLLABORATOR\"]'), github.event.pull_request.author_association) }}",
       "runs-on": "ubuntu-24.04",
       "timeout-minutes": 15,
-      "permissions": {"contents": "read", "pull-requests": "write"},
+      "permissions": {"contents": "read"},
       "steps": [
         {
-          "name": "Validate configuration without displaying credentials",
-          "env": {
-            "OCR_URL": "${{ secrets.OCR_LLM_URL }}",
-            "OCR_TOKEN": "${{ secrets.OCR_LLM_AUTH_TOKEN }}",
-            "OCR_MODEL": "${{ vars.OCR_LLM_MODEL }}",
-            "OCR_PROTOCOL": "${{ vars.OCR_LLM_PROTOCOL }}",
-            "REPOSITORY_PRIVATE": "${{ github.event.repository.private }}",
-            "PUBLIC_FINDINGS_APPROVED": "${{ vars.OCR_PUBLIC_FINDINGS_APPROVED }}"
-          },
-          "run": "python3 -I - <<'PY'\nimport os, re, subprocess, sys\nfrom urllib.parse import urlsplit\n\ndef stop(message):\n    print('::error::' + message)\n    sys.exit(1)\n\nif not all(os.environ.get(name) for name in ('OCR_URL', 'OCR_TOKEN', 'OCR_MODEL', 'OCR_PROTOCOL')):\n    stop('OCR configuration is incomplete. Configure the documented secrets and variables; no review was performed.')\ntry:\n    endpoint = urlsplit(os.environ['OCR_URL'])\n    valid_url = endpoint.scheme == 'https' and endpoint.hostname and not endpoint.username and not endpoint.password and not endpoint.fragment and not endpoint.query\n    endpoint.port\nexcept ValueError:\n    valid_url = False\nif not valid_url:\n    stop('OCR requires an HTTPS endpoint without embedded credentials, query parameters or fragments.')\nif os.environ['OCR_PROTOCOL'] not in ('openai', 'openai-responses', 'anthropic'):\n    stop('OCR_LLM_PROTOCOL must be openai, openai-responses or anthropic.')\nif os.environ.get('REPOSITORY_PRIVATE') != 'true' and os.environ.get('PUBLIC_FINDINGS_APPROVED') != 'true':\n    stop('Public findings publication is not authorized. No review was performed.')\nversion = subprocess.run(['git', '--version'], capture_output=True, text=True, check=True).stdout\nmatch = re.match(r'git version (\\d+)\\.(\\d+)', version)\nif not match or tuple(map(int, match.groups())) < (2, 41):\n    stop('OpenCodeReview requires Git 2.41 or newer.')\nprint('OCR configuration prerequisites passed; this is not review evidence.')\nPY"
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "ref": "${{ github.event.pull_request.base.sha }}",
+            "path": "trusted",
+            "fetch-depth": 0,
+            "persist-credentials": false
+          }
         },
         {
-          "name": "Review PR with pinned upstream OpenCodeReview",
-          "uses": "alibaba/open-code-review@1672852136fc87748249d22bce0819f33419ea79",
-          "with": {
-            "ocr_version": "1.13.0",
-            "llm_url": "${{ secrets.OCR_LLM_URL }}",
-            "llm_auth_token": "${{ secrets.OCR_LLM_AUTH_TOKEN }}",
-            "llm_model": "${{ vars.OCR_LLM_MODEL }}",
-            "llm_protocol": "${{ vars.OCR_LLM_PROTOCOL }}",
-            "llm_use_anthropic": "${{ vars.OCR_LLM_PROTOCOL == 'anthropic' && 'true' || 'false' }}",
-            "llm_extra_body": "${{ vars.OCR_LLM_PROTOCOL == 'anthropic' && '{}' || '{\"store\":false}' }}",
-            "llm_timeout": "60",
-            "review_task_timeout": "2",
-            "review_concurrency": "1",
-            "effort": "low",
-            "max_tokens_budget": "20000",
-            "upload_artifacts": "false",
-            "stream_progress": "false",
-            "sticky_summary": "true",
-            "incremental": "true",
-            "resolve_outdated": "false"
-          }
+          "name": "Validate provider configuration without displaying credentials",
+          "env": {
+            "OCR_LLM_URL": "${{ secrets.OCR_LLM_URL }}",
+            "OCR_LLM_TOKEN": "${{ secrets.OCR_LLM_AUTH_TOKEN }}",
+            "OCR_LLM_MODEL": "${{ vars.OCR_LLM_MODEL }}",
+            "OCR_LLM_PROTOCOL": "${{ vars.OCR_LLM_PROTOCOL }}"
+          },
+          "run": "python3 -I trusted/.github/ocr-ci.py validate"
+        },
+        {
+          "name": "Install pinned upstream CLI outside the source tree",
+          "working-directory": "${{ runner.temp }}",
+          "run": "npm install --prefix \"$RUNNER_TEMP/ocr-cli\" --no-audit --no-fund @alibaba-group/open-code-review@1.13.0"
+        },
+        {
+          "name": "Fetch and verify immutable PR objects without a head checkout",
+          "id": "range",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}",
+            "PR_NUMBER": "${{ github.event.pull_request.number }}",
+            "BASE_SHA": "${{ github.event.pull_request.base.sha }}",
+            "HEAD_SHA": "${{ github.event.pull_request.head.sha }}"
+          },
+          "run": "python3 -I trusted/.github/ocr-ci.py fetch"
+        },
+        {
+          "name": "Review Git range; emit counts only, never findings or provider logs",
+          "env": {
+            "OCR_LLM_URL": "${{ secrets.OCR_LLM_URL }}",
+            "OCR_LLM_TOKEN": "${{ secrets.OCR_LLM_AUTH_TOKEN }}",
+            "OCR_LLM_MODEL": "${{ vars.OCR_LLM_MODEL }}",
+            "OCR_LLM_PROTOCOL": "${{ vars.OCR_LLM_PROTOCOL }}",
+            "BASE_SHA": "${{ steps.range.outputs.merge_base }}",
+            "HEAD_SHA": "${{ github.event.pull_request.head.sha }}"
+          },
+          "run": "python3 -I trusted/.github/ocr-ci.py review"
         }
       ]
     }

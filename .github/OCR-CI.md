@@ -1,8 +1,7 @@
 ---
 type: Reference
 title: OpenCodeReview CI
-description: Pinned upstream PR review configuration, activation and privacy boundaries.
-resource: .github/OCR-CI.md
+description: Read-only upstream CLI integration, activation and privacy boundaries.
 sources:
   - id: upstream-ci
     resource: https://github.com/alibaba/open-code-review/blob/1672852136fc87748249d22bce0819f33419ea79/pages/src/content/docs/en/integrations/ci.md
@@ -10,82 +9,84 @@ sources:
 
 # OpenCodeReview CI
 
-This repository uses the upstream OpenCodeReview PR action, pinned to commit
-`1672852136fc87748249d22bce0819f33419ea79` and CLI version `1.13.0`.
-It does not require the separate custom source-build/signing proof workflow.
+This integration follows the upstream CLI CI recipe: install OCR, configure an
+LLM, review an immutable Git range and parse its JSON. It pins CLI `1.13.0` and
+checks `ocr.run-manifest/v1` coverage. It does not depend on the separate custom
+source-build/signing proof workflow.
 
 ## Configuration and activation
 
-Installation is not activation or evidence that a review ran. The workflow is
-inactive until an authorized administrator sets repository variable
-`OCR_CI_ENABLED=true`. Do not set it merely because credentials are available.
-First authorize the provider, sending repository content to that provider, and
-recurring usage/spending. No Azure resources or permissions are provisioned.
+Installation is not activation or review evidence. An authorized administrator
+must approve the provider, sending repository content to it and recurring
+usage/spending before setting repository variable `OCR_CI_ENABLED=true`.
+Credentials being present is not authorization. No Azure resources, identities
+or permissions are provisioned by this workflow.
 
-Configure these through GitHub Actions settings, never in source or chat:
+Configure these in GitHub Actions settings, never in source or chat:
 
 | Kind | Name | Purpose |
 |------|------|---------|
-| Secret | `OCR_LLM_URL` | HTTPS inference endpoint; no embedded credentials or query string |
-| Secret | `OCR_LLM_AUTH_TOKEN` | Provider credential, mapped by upstream to `OCR_LLM_TOKEN` |
+| Secret | `OCR_LLM_URL` | HTTPS inference endpoint, without embedded credentials, query or fragment |
+| Secret | `OCR_LLM_AUTH_TOKEN` | Provider credential; mapped to OCR's `OCR_LLM_TOKEN` |
 | Variable | `OCR_LLM_MODEL` | Explicit model or deployment name |
 | Variable | `OCR_LLM_PROTOCOL` | `openai`, `openai-responses` or `anthropic` |
-| Variable | `OCR_CI_ENABLED` | Exact string `true` after activation authorization |
-| Variable | `OCR_PUBLIC_FINDINGS_APPROVED` | Exact string `true` only if public PR findings are explicitly authorized |
+| Variable | `OCR_CI_ENABLED` | Exact string `true` only after activation authorization |
 
-Use an organization secret with selected-repository access where available,
-otherwise scoped repository secrets. Do not reuse an unrelated Azure identity or
-GitHub audit credential. Azure short-lived managed-identity authentication needs
-its own approved CI identity integration; a stored expiring access token is not
-a durable replacement.
+Use selected-repository organization secrets where available, otherwise scoped
+repository secrets. Do not reuse unrelated audit credentials or Azure identities.
+Managed-identity authentication requires an approved CI identity integration;
+storing an expiring Azure access token is not a durable substitute.
 
-## Execution and privacy
+## Trust and privacy
 
-Opened, updated, reopened and ready-for-review PRs trigger the workflow. Only
-non-draft PRs whose author association is OWNER, MEMBER or COLLABORATOR are
-eligible. Untrusted external contributors are not automatically given access to
-provider quota; their skipped run is **not** a review. There is no comment-trigger
-or scheduled spending surface.
+The workflow uses `pull_request`, not `pull_request_target`, and has only
+`contents: read` permissions. Only non-draft, same-repository PRs authored by an
+OWNER, MEMBER or COLLABORATOR are eligible. External fork PRs are skipped, not
+reviewed, even when their author is an organization member.
 
-The pinned upstream action checks out the trusted base and fetches the PR head
-as Git objects. This workflow adds no head checkout, target build or test.
-It reviews the Git range and publishes upstream's sticky summary and inline
-comments. Findings are visible to everyone who can read that PR. Public
-repositories fail before invocation unless public findings publication is
-explicitly authorized. If findings must stay private, leave that authorization
-unset and do not enable this publication path; a private findings sink is a
-separate integration.
+The job checks out the immutable trusted base SHA. Its trusted helper fetches
+the PR's objects with a temporary read credential, verifies the exact head and
+computes the merge-base. It never checks out the head or runs target builds,
+tests, package scripts or commands. Installation of the pinned upstream npm
+package occurs separately outside the source tree, without provider credentials.
 
-No raw review artifacts or live progress streaming are enabled. However, the
-pinned upstream action always prints the final JSON and captured stderr to its
-job log. Public publication authorization therefore covers both logs and PR
-comments; disabling artifacts does not make the log private. Credentials
-are supplied only to configuration validation and the pinned upstream action,
-never interpolated into shell source. GitHub masks configured secret values,
-but that is not a guarantee that arbitrary secrets already in repository files
-or model-generated findings cannot appear in comments. Do not send sensitive
-data to an unapproved provider or authorize public output as a substitute for
-secret scanning.
+OCR receives only its allowlisted provider environment and a temporary HOME.
+The GitHub token and unrelated environment secrets are not passed to OCR.
+Its npm launcher's detached auto-updater is disabled with `OCR_NO_UPDATE=1`.
+A mode-0600 temporary configuration binds endpoint, model, protocol and
+`store:false` together for OpenAI-compatible requests; a fixed token command
+reads the provider token from the environment rather than storing its value.
+Captured JSON/stderr are size-bounded, remain temporary and are discarded.
+Only fixed status and numeric counts reach logs and the step summary. No finding
+content, file paths, raw provider errors, PR comments or artifacts are published.
 
-## Limits and evidence
+This deliberately uses the documented **CLI**, not the upstream composite
+action: the latter needs write permissions and prints final raw results, which
+conflicts with several repositories' policies. Those policies are not weakened.
+Any repository that prohibits automatic workflows altogether must keep the PR
+blocked until a separate compatible policy decision; installation must not
+silently bypass its validator.
 
-Each job has a 15-minute ceiling, one review task at a time, low effort,
-60-second request timeout, two-minute task timeout and a 20,000-token upstream
-budget. A new event cancels the preceding run for that PR. These are workload
-controls, **not** a hard dollar cap or organization-wide spending limit.
-Upstream may finish an in-flight round and publish partial findings after
-exhausting its token budget; exit zero alone does not prove complete coverage.
-Provider-side budgets/rate limits and recurring spending authorization remain
-necessary before activation.
+## Limits, coverage and finding access
 
-Keep this advisory rather than a required merge check until actual provider,
-publication and coverage behavior have been observed. Record the reviewed head,
-run URL, selected/covered/failed files and partial status; never label a skipped
-or unconfigured run as a clean audit.
+The job ceiling is 15 minutes. OCR runs one task at a time, low effort, a
+20,000-token advisory budget and two-minute per-task timeout; each owned command
+has a three-minute parent deadline. A newer event cancels the same PR's old job.
+These are workload controls, **not** a hard dollar cap or aggregate spending
+limit. Configure provider-side budgets/rate limits before activation.
 
-Cloudflare's `security-audit-skill` is not run by this action. Its genuine
-multi-agent audit runtime remains separate and must not be claimed as installed
-or verified by an OCR result.
+Incomplete, budget-exhausted, malformed, wrong-range and nonzero-exit results
+fail closed. Success means coverage of OCR's selected range, not every repository
+file, proven model quality or absence of vulnerabilities. Skips and missing
+configuration are not clean reviews.
 
-Rollback: set `OCR_CI_ENABLED=false` first, cancel owned running reviews, then
-revert the additive workflow if needed. No branch protection changes are made.
+**This is counts-only CI, not actionable finding delivery.** Authorized owners
+must run OCR locally for details until an approved private publisher is added.
+Keep the check advisory until provider and coverage behavior have been observed;
+do not add it as a required merge check solely because the workflow is installed.
+
+Cloudflare's multi-agent `security-audit-skill` is not executed here and remains
+separate work. An OCR result does not establish Cloudflare coverage.
+
+Rollback: set `OCR_CI_ENABLED=false`, cancel owned running reviews and revert the
+additive workflow if necessary. No branch protection changes are made.
