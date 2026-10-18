@@ -1,66 +1,56 @@
-{
-  "name": "OpenCodeReview PR review",
-  "on": {"pull_request": {"types": ["opened", "synchronize", "reopened", "ready_for_review"]}},
-  "permissions": {"contents": "read"},
-  "concurrency": {
-    "group": "ocr-pr-review-${{ github.event.pull_request.number }}",
-    "cancel-in-progress": true
-  },
-  "jobs": {
-    "review": {
-      "if": "${{ vars.OCR_CI_ENABLED == 'true' && github.event.pull_request.head.repo.full_name == github.repository && !github.event.pull_request.draft && contains(fromJSON('[\"OWNER\",\"MEMBER\",\"COLLABORATOR\"]'), github.event.pull_request.author_association) }}",
-      "runs-on": "ubuntu-24.04",
-      "timeout-minutes": 15,
-      "permissions": {"contents": "read"},
-      "steps": [
-        {
-          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
-          "with": {
-            "ref": "${{ github.event.pull_request.base.sha }}",
-            "path": "trusted",
-            "fetch-depth": 0,
-            "persist-credentials": false
-          }
-        },
-        {
-          "name": "Validate provider configuration without displaying credentials",
-          "env": {
-            "OCR_LLM_URL": "${{ secrets.OCR_LLM_URL }}",
-            "OCR_LLM_TOKEN": "${{ secrets.OCR_LLM_AUTH_TOKEN }}",
-            "OCR_LLM_MODEL": "${{ vars.OCR_LLM_MODEL }}",
-            "OCR_LLM_PROTOCOL": "${{ vars.OCR_LLM_PROTOCOL }}"
-          },
-          "run": "python3 -I trusted/.github/ocr-ci.py validate"
-        },
-        {
-          "name": "Install pinned upstream CLI outside the source tree",
-          "working-directory": "${{ runner.temp }}",
-          "run": "npm install --prefix \"$RUNNER_TEMP/ocr-cli\" --no-audit --no-fund @alibaba-group/open-code-review@1.13.0"
-        },
-        {
-          "name": "Fetch and verify immutable PR objects without a head checkout",
-          "id": "range",
-          "env": {
-            "GH_TOKEN": "${{ github.token }}",
-            "PR_NUMBER": "${{ github.event.pull_request.number }}",
-            "BASE_SHA": "${{ github.event.pull_request.base.sha }}",
-            "HEAD_SHA": "${{ github.event.pull_request.head.sha }}"
-          },
-          "run": "python3 -I trusted/.github/ocr-ci.py fetch"
-        },
-        {
-          "name": "Review Git range; emit counts only, never findings or provider logs",
-          "env": {
-            "OCR_LLM_URL": "${{ secrets.OCR_LLM_URL }}",
-            "OCR_LLM_TOKEN": "${{ secrets.OCR_LLM_AUTH_TOKEN }}",
-            "OCR_LLM_MODEL": "${{ vars.OCR_LLM_MODEL }}",
-            "OCR_LLM_PROTOCOL": "${{ vars.OCR_LLM_PROTOCOL }}",
-            "BASE_SHA": "${{ steps.range.outputs.merge_base }}",
-            "HEAD_SHA": "${{ github.event.pull_request.head.sha }}"
-          },
-          "run": "python3 -I trusted/.github/ocr-ci.py review"
-        }
-      ]
-    }
-  }
-}
+name: OpenCodeReview PR review
+'on':
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+permissions:
+  contents: read
+concurrency:
+  group: ocr-pr-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  review:
+    if: >-
+      ${{ vars.OCR_CI_ENABLED == 'true' &&
+          github.event.pull_request.head.repo.full_name == github.repository &&
+          !github.event.pull_request.draft &&
+          contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'),
+                   github.event.pull_request.author_association) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: trusted
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Validate provider configuration without displaying credentials
+        env:
+          OCR_LLM_URL: ${{ secrets.OCR_LLM_URL }}
+          OCR_LLM_TOKEN: ${{ secrets.OCR_LLM_AUTH_TOKEN }}
+          OCR_LLM_MODEL: ${{ vars.OCR_LLM_MODEL }}
+          OCR_LLM_PROTOCOL: ${{ vars.OCR_LLM_PROTOCOL }}
+        run: python3 -I trusted/.github/ocr-ci.py validate
+      - name: Install pinned upstream CLI outside the source tree
+        working-directory: ${{ runner.temp }}
+        run: >-
+          npm install --prefix "$RUNNER_TEMP/ocr-cli" --no-audit --no-fund @alibaba-group/open-code-review@1.13.0
+      - name: Fetch and verify immutable PR objects without a head checkout
+        id: range
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: python3 -I trusted/.github/ocr-ci.py fetch
+      - name: Review Git range; emit counts only, never findings or provider logs
+        env:
+          OCR_LLM_URL: ${{ secrets.OCR_LLM_URL }}
+          OCR_LLM_TOKEN: ${{ secrets.OCR_LLM_AUTH_TOKEN }}
+          OCR_LLM_MODEL: ${{ vars.OCR_LLM_MODEL }}
+          OCR_LLM_PROTOCOL: ${{ vars.OCR_LLM_PROTOCOL }}
+          BASE_SHA: ${{ steps.range.outputs.merge_base }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: python3 -I trusted/.github/ocr-ci.py review

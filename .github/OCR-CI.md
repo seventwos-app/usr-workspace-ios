@@ -3,13 +3,15 @@ type: Reference
 title: OpenCodeReview CI
 description: Read-only upstream CLI integration, activation and privacy boundaries.
 sources:
-  - id: upstream-ci
-    resource: https://github.com/alibaba/open-code-review/blob/1672852136fc87748249d22bce0819f33419ea79/pages/src/content/docs/en/integrations/ci.md
+  - id: ocr-workflow
+    resource: .github/workflows/ocr-pr-review.yml
 ---
 
 # OpenCodeReview CI
 
-This integration follows the upstream CLI CI recipe: install OCR, configure an
+This workflow[^ocr-workflow] follows the
+[upstream CLI CI recipe](https://github.com/alibaba/open-code-review/blob/1672852136fc87748249d22bce0819f33419ea79/pages/src/content/docs/en/integrations/ci.md):
+install OCR, configure an
 LLM, review an immutable Git range and parse its JSON. It pins CLI `1.13.0` and
 checks `ocr.run-manifest/v1` coverage. It does not depend on the separate custom
 source-build/signing proof workflow.
@@ -90,3 +92,5 @@ separate work. An OCR result does not establish Cloudflare coverage.
 
 Rollback: set `OCR_CI_ENABLED=false`, cancel owned running reviews and revert the
 additive workflow if necessary. No branch protection changes are made.
+
+[^ocr-workflow]: [Read-only OpenCodeReview workflow](workflows/ocr-pr-review.yml).
