@@ -97,7 +97,8 @@ class CodeQLBuildSettingsTests(unittest.TestCase):
             check=True,
         )
         self.assertEqual(result.stdout.splitlines(), [
-            "-j1", "-j4", "source with spaces.swift", "-j1",
+            "-j1", "-j4", "source with spaces.swift",
+            "-j1", "-driver-batch-size-limit", "100",
         ])
 
     @unittest.skipIf(os.name == "nt", "Requires the macOS/Linux Bash execution environment")

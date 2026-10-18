@@ -8,4 +8,5 @@ for argument in "$@"; do
     fi
 done
 
-exec "$CODEQL_REAL_SWIFTC" "$@" -j1
+# Amortize repeated module loading without running multiple large extractors.
+exec "$CODEQL_REAL_SWIFTC" "$@" -j1 -driver-batch-size-limit 100

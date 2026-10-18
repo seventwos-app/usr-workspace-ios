@@ -125,7 +125,7 @@ jobs:
           monitor_pid=$!
           trap 'kill "$monitor_pid"' EXIT
 
-          CODEQL_ANALYSIS=1 xcodebuild build \
+          CODEQL_ANALYSIS=1 xcodebuild build -showBuildTimingSummary \
             -project Seventwos.xcodeproj \
             -scheme Seventwos \
             -configuration Debug \
