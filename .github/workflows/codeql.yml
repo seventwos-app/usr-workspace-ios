@@ -1,0 +1,123 @@
+name: CodeQL
+
+on:
+  schedule:
+    - cron: '17 3 * * 1'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  analyze:
+    name: Analyze iOS (Swift)
+    runs-on: macos-26-intel
+    timeout-minutes: 180
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          lfs: true
+          persist-credentials: false
+      - name: Select repository Xcode version
+        run: |
+          source ci_scripts/ci_common.sh
+          xcode_select_for_github_actions
+          xcodebuild -version
+      - name: Verify checked-in generated sources
+        run: |
+          for source in \
+            Seventwos/Sources/Generated/Assets.swift \
+            Seventwos/Sources/Generated/Strings.swift \
+            Seventwos/Sources/Generated/Strings+Untranslated.swift \
+            Seventwos/Sources/Mocks/Generated/GeneratedMocks.swift \
+            Seventwos/Sources/Other/TestablePreview/TestablePreviewsDictionary.swift \
+            PreviewTests/Sources/GeneratedPreviewTests.swift \
+            AccessibilityTests/Sources/GeneratedAccessibilityTests.swift; do
+            git ls-files --error-unmatch "$source"
+            test -s "$source"
+          done
+      - name: Verify resolved simulator architectures
+        run: |
+          CODEQL_XCCONFIG="$(mktemp -d "$RUNNER_TEMP/codeql.XXXXXX")/simulator.xcconfig"
+          # Conditional build settings must be parsed as xcconfig, not CLI assignments.
+          printf '%s\n' 'EXCLUDED_ARCHS[sdk=iphonesimulator*] = arm64' > "$CODEQL_XCCONFIG"
+          echo "CODEQL_XCCONFIG=$CODEQL_XCCONFIG" >> "$GITHUB_ENV"
+          CODEQL_ANALYSIS=1 xcodebuild \
+            -project Seventwos.xcodeproj \
+            -scheme Seventwos \
+            -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' \
+            -xcconfig "$CODEQL_XCCONFIG" \
+            -jobs 1 \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            CLANG_ENABLE_CODE_COVERAGE=NO \
+            ONLY_ACTIVE_ARCH=YES \
+            COMPILATION_CACHE_ENABLE_CACHING=NO \
+            SWIFT_ENABLE_COMPILE_CACHE=NO \
+            SWIFT_USE_INTEGRATED_DRIVER=NO \
+            -showBuildSettings -json > "$RUNNER_TEMP/codeql-build-settings.json"
+          python3 - "$RUNNER_TEMP/codeql-build-settings.json" <<'PY'
+          import json
+          import sys
+
+          with open(sys.argv[1], encoding="utf-8") as source:
+              targets = json.load(source)
+          if not isinstance(targets, list) or not targets:
+              sys.exit("Expected a nonempty list of resolved Xcode target settings")
+          simulator_targets = set()
+          for target in targets:
+              settings = target["buildSettings"]
+              if settings["PLATFORM_NAME"] != "iphonesimulator":
+                  continue
+              name = target["target"]
+              architectures = set(settings["ARCHS"].split())
+              excluded = set(settings.get("EXCLUDED_ARCHS", "").split())
+              effective = architectures - excluded
+              print(f"{name}: ARCHS={sorted(architectures)}, EXCLUDED_ARCHS={sorted(excluded)}")
+              if effective != {"x86_64"} or "arm64" not in excluded:
+                  sys.exit(f"{name}: expected only x86_64 after SDK-scoped exclusions, got {sorted(effective)}")
+              simulator_targets.add(name)
+          if "Seventwos" not in simulator_targets:
+              sys.exit("Missing resolved simulator settings for the Seventwos app")
+          PY
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4
+        with:
+          languages: swift
+          build-mode: manual
+      - name: Build app debug simulator variant
+        run: |
+          (
+            while true; do
+              echo "::group::Build resource snapshot $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+              vm_stat
+              sysctl vm.swapusage
+              df -h "$RUNNER_TEMP"
+              ps -axo pid,ppid,%cpu,rss,etime,comm | sort -k4,4nr | sed -n '1,12p'
+              echo "::endgroup::"
+              sleep 120
+            done
+          ) &
+          monitor_pid=$!
+          trap 'kill "$monitor_pid"' EXIT
+
+          CODEQL_ANALYSIS=1 xcodebuild build \
+            -project Seventwos.xcodeproj \
+            -scheme Seventwos \
+            -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' \
+            -xcconfig "$CODEQL_XCCONFIG" \
+            -jobs 1 \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            CLANG_ENABLE_CODE_COVERAGE=NO \
+            ONLY_ACTIVE_ARCH=YES \
+            COMPILATION_CACHE_ENABLE_CACHING=NO \
+            SWIFT_ENABLE_COMPILE_CACHE=NO \
+            SWIFT_USE_INTEGRATED_DRIVER=NO
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4

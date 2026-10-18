@@ -15,7 +15,20 @@ setup_github_actions_environment() {
     unset HOMEBREW_NO_INSTALL_FROM_API
     export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
     
-    brew update && brew install xcodegen swiftlint swiftformat git-lfs pkl
+    brew update
+    brew install xcodegen swiftlint git-lfs pkl
+
+    # Keep CI on the formatter used by the source tree; Homebrew upgrades can add lint rules.
+    swiftformat_directory="$RUNNER_TEMP/swiftformat-0.63.1"
+    mkdir -p "$swiftformat_directory"
+    curl --fail --location --silent --show-error \
+        https://github.com/nicklockwood/SwiftFormat/releases/download/0.63.1/swiftformat.zip \
+        --output "$swiftformat_directory/swiftformat.zip"
+    echo "385ef1a263ba28685157b98c5536b9c9105e124518f28b7ef8a2bee4b167eaeb  $swiftformat_directory/swiftformat.zip" | shasum -a 256 -c -
+    unzip -o -q "$swiftformat_directory/swiftformat.zip" -d "$swiftformat_directory"
+    export PATH="$swiftformat_directory:$PATH"
+    echo "$swiftformat_directory" >> "$GITHUB_PATH"
+    swiftformat --version
 }
 
 setup_github_actions_translations_environment() {
