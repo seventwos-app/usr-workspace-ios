@@ -280,8 +280,7 @@ class LiveLocationManager: NSObject, LiveLocationManagerProtocol, CLLocationMana
     /// This ensures at least 3 seconds or the send duration itself between consecutive sends,
     /// discarding any intermediate updates while always keeping the last one.
     private func processLocationUpdateIfNeeded() {
-        guard !isProcessingLocationUpdate, let location = latestPendingLocation else { return }
-        guard !appSettings.liveLocationSharingSessionsByRoomID.isEmpty else { return }
+        guard !isProcessingLocationUpdate, let location = latestPendingLocation, !appSettings.liveLocationSharingSessionsByRoomID.isEmpty else { return }
         
         latestPendingLocation = nil
         isProcessingLocationUpdate = true

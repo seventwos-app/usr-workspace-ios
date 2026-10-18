@@ -1,5 +1,9 @@
 # Copilot Instructions
 
+## Autonomous review policy
+
+Follow [Autonomous review and separation of duties](instructions/autonomous-review.instructions.md) for purpose/outcome challenge, CI evidence reuse, independent finding closure, and bounded Copilot adjudication. Use existing review agents; do not add a routine human approval gate or duplicate review rounds. Preserve mandatory specialist gates, required checks, and action authorization.
+
 ## Pull requests and merge authority
 
 - Use a branch and PR for changes targeting the default branch, `main`, or `develop`. The organization-wide [Copilot review and owner-led merge ruleset](https://github.com/organizations/seventwos-app/settings/rules/25233290) requests Copilot review on PR creation and subsequent pushes; draft PRs are reviewed when ready.
