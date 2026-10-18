@@ -2,6 +2,7 @@
 """Exercise the actual CodeQL workflow's resolved-build-settings guard."""
 
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -40,16 +41,6 @@ class CodeQLBuildSettingsTests(unittest.TestCase):
         })
         self.assertEqual(result.returncode, 0, result.stderr)
 
-    def test_missing_swift_driver_cap_fails(self):
-        result = self.run_guard({
-            "PLATFORM_NAME": "iphonesimulator",
-            "ARCHS": "x86_64",
-            "EXCLUDED_ARCHS": "arm64",
-            "OTHER_SWIFT_FLAGS": "-DDEBUG",
-        })
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("missing Swift driver concurrency cap", result.stderr)
-
     def test_wrong_architecture_fails(self):
         result = self.run_guard({
             "PLATFORM_NAME": "iphonesimulator",
@@ -59,6 +50,34 @@ class CodeQLBuildSettingsTests(unittest.TestCase):
         })
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("expected only x86_64", result.stderr)
+
+    @unittest.skipIf(os.name == "nt", "Requires the macOS/Linux Bash execution environment")
+    def test_driver_cap_follows_xcode_arguments(self):
+        wrapper = ROOT / "ci_scripts/codeql_swiftc.sh"
+        env = {**os.environ, "CODEQL_REAL_SWIFTC": "/usr/bin/printf"}
+        result = subprocess.run(
+            ["bash", str(wrapper), "%s\n", "-j1", "-j4", "source with spaces.swift"],
+            env=env,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        self.assertEqual(result.stdout.splitlines(), [
+            "-j1", "-j4", "source with spaces.swift", "-j1",
+        ])
+
+    @unittest.skipIf(os.name == "nt", "Requires the macOS/Linux Bash execution environment")
+    def test_frontend_invocation_is_unchanged(self):
+        wrapper = ROOT / "ci_scripts/codeql_swiftc.sh"
+        env = {**os.environ, "CODEQL_REAL_SWIFTC": "/usr/bin/printf"}
+        result = subprocess.run(
+            ["bash", str(wrapper), "%s\n", "-frontend", "source with spaces.swift"],
+            env=env,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        self.assertEqual(result.stdout.splitlines(), ["-frontend", "source with spaces.swift"])
 
 
 if __name__ == "__main__":
