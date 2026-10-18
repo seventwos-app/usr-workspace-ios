@@ -1,3 +1,13 @@
+---
+type: Reference
+title: OpenCodeReview CI
+description: Pinned upstream PR review configuration, activation and privacy boundaries.
+resource: .github/OCR-CI.md
+sources:
+  - id: upstream-ci
+    resource: https://github.com/alibaba/open-code-review/blob/1672852136fc87748249d22bce0819f33419ea79/pages/src/content/docs/en/integrations/ci.md
+---
+
 # OpenCodeReview CI
 
 This repository uses the upstream OpenCodeReview PR action, pinned to commit
