@@ -126,8 +126,8 @@ private enum FilterType {
     case auditType(XCUIAccessibilityAuditType)
 }
 
+@MainActor
 private extension Array where Element == FilterType {
-    @MainActor
     func isAccessibilityIssueFiltered(_ issue: XCUIAccessibilityAuditIssue) -> Bool {
         for filter in self {
             switch filter {
