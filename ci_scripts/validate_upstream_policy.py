@@ -230,11 +230,15 @@ def validate_pull_request_scope(workflow: dict[str, Any]) -> None:
     if scope_index is None:
         fail("unfiltered pull_request trigger requires a scope step")
     scope_step = steps[scope_index]
+    if set(scope_step) != {"name", "id", "env", "run"}:
+        fail("pull_request scope step must run unconditionally with only name, id, env, and run")
     if scope_step.get("env") != POLICY_SCOPE_ENV or scope_step.get("run") != POLICY_SCOPE_RUN:
         fail("pull_request scope step must cover every policy-owned path with the canonical script")
     for step in steps[scope_index + 1:]:
         if not isinstance(step, dict) or step.get("if") != "steps.scope.outputs.relevant == 'true'":
             fail("steps after the pull_request scope step must be gated on its result")
+        if "continue-on-error" in step:
+            fail("steps after the pull_request scope step must not continue on error")
 
 
 def validate_workflow(root: Path, state: dict[str, Any]) -> None:

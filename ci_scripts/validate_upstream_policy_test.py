@@ -152,6 +152,34 @@ class UpstreamPolicyValidatorTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("scope step must cover", result.stderr)
 
+    def test_rejects_conditional_pull_request_scope_step(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.copy_repository_files(root)
+            workflow = root / ".github/workflows/upstream-assessment.yml"
+            content = workflow.read_text(encoding="utf-8").replace(
+                "        id: scope\n", "        id: scope\n        if: false\n", 1
+            )
+            workflow.write_text(content, encoding="utf-8")
+            result = self.run_validator(root)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("must run unconditionally", result.stderr)
+
+    def test_rejects_continue_on_error_after_pull_request_scope(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.copy_repository_files(root)
+            workflow = root / ".github/workflows/upstream-assessment.yml"
+            content = workflow.read_text(encoding="utf-8").replace(
+                "      - name: Validate immutable inputs and policy\n        if: steps.scope.outputs.relevant == 'true'\n",
+                "      - name: Validate immutable inputs and policy\n        if: steps.scope.outputs.relevant == 'true'\n        continue-on-error: true\n",
+                1,
+            )
+            workflow.write_text(content, encoding="utf-8")
+            result = self.run_validator(root)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("must not continue on error", result.stderr)
+
     def test_rejects_ungated_step_after_pull_request_scope(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
