@@ -51,6 +51,21 @@ class CodeQLBuildSettingsTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("expected only x86_64", result.stderr)
 
+    def test_dependencies_prebuild_before_tracing_with_shared_derived_data(self):
+        workflow = WORKFLOW.read_text(encoding="utf-8")
+        prebuild = workflow.index("Prebuild package dependencies outside CodeQL tracing")
+        init = workflow.index("- name: Initialize CodeQL")
+        traced = workflow.index("- name: Build app debug simulator variant")
+        self.assertLess(prebuild, init)
+        self.assertLess(init, traced)
+        self.assertIn('-derivedDataPath "$DERIVED_DATA"', workflow[prebuild:init])
+        self.assertIn('-derivedDataPath "$CODEQL_DERIVED_DATA"', workflow[traced:])
+        removal = workflow[prebuild:init].split("for target in ")[1].split("; do")[0].split()
+        self.assertEqual(
+            removal,
+            ["MapLibreInterface", "MapLibreShim", "MatrixRustSDKMocks", "NSE", "Seventwos", "ShareExtension"],
+        )
+
     @unittest.skipIf(os.name == "nt", "Requires the macOS/Linux Bash execution environment")
     def test_wrapper_preserves_toolchain_discovery(self):
         workflow = WORKFLOW.read_text(encoding="utf-8")
@@ -97,8 +112,7 @@ class CodeQLBuildSettingsTests(unittest.TestCase):
             check=True,
         )
         self.assertEqual(result.stdout.splitlines(), [
-            "-j1", "-j4", "source with spaces.swift",
-            "-j1", "-driver-batch-size-limit", "100",
+            "-j1", "-j4", "source with spaces.swift", "-j1",
         ])
 
     @unittest.skipIf(os.name == "nt", "Requires the macOS/Linux Bash execution environment")
