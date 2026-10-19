@@ -11,7 +11,7 @@ jobs:
   analyze:
     name: Analyze iOS (Swift)
     runs-on: macos-26-intel
-    timeout-minutes: 180
+    timeout-minutes: 360
     permissions:
       actions: read
       contents: read
