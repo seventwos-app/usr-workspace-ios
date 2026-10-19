@@ -51,26 +51,19 @@ class CodeQLBuildSettingsTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("expected only x86_64", result.stderr)
 
-    def test_dependencies_prebuild_before_tracing_with_shared_derived_data(self):
+    def test_full_build_is_traced_without_prebuild(self):
         workflow = WORKFLOW.read_text(encoding="utf-8")
-        prebuild = workflow.index("Prebuild package dependencies outside CodeQL tracing")
         init = workflow.index("- name: Initialize CodeQL")
         traced = workflow.index("- name: Build app debug simulator variant")
-        self.assertLess(prebuild, init)
         self.assertLess(init, traced)
-        self.assertIn('-derivedDataPath "$DERIVED_DATA"', workflow[prebuild:init])
-        self.assertIn('-derivedDataPath "$CODEQL_DERIVED_DATA"', workflow[traced:])
-        removal = workflow[prebuild:init].split("for target in ")[1].split("; do")[0].split()
-        self.assertEqual(
-            removal,
-            ["MapLibreInterface", "MapLibreShim", "MatrixRustSDKMocks", "NSE", "Seventwos", "ShareExtension"],
-        )
+        self.assertNotIn("xcodebuild build", workflow[:init])
+        self.assertIn("xcodebuild build", workflow[traced:])
 
     @unittest.skipIf(os.name == "nt", "Requires the macOS/Linux Bash execution environment")
     def test_wrapper_preserves_toolchain_discovery(self):
         workflow = WORKFLOW.read_text(encoding="utf-8")
         start = workflow.index('          CODEQL_REAL_SWIFTC="$(xcrun --find swiftc)"')
-        end = workflow.index("\n      - name: Initialize CodeQL", start)
+        end = workflow.index("\n      - name:", start)
         script = "\n".join(line[10:] for line in workflow[start:end].splitlines())
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

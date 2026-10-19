@@ -104,30 +104,6 @@ jobs:
           echo "CODEQL_REAL_SWIFTC=$CODEQL_REAL_SWIFTC" >> "$GITHUB_ENV"
           echo "CODEQL_SWIFT_EXEC=$CODEQL_SWIFT_EXEC" >> "$GITHUB_ENV"
           CODEQL_REAL_SWIFTC="$CODEQL_REAL_SWIFTC" "$CODEQL_SWIFT_EXEC" --version
-      - name: Prebuild package dependencies outside CodeQL tracing
-        run: |
-          DERIVED_DATA="$RUNNER_TEMP/DerivedData"
-          echo "CODEQL_DERIVED_DATA=$DERIVED_DATA" >> "$GITHUB_ENV"
-          CODEQL_ANALYSIS=1 xcodebuild build \
-            -project Seventwos.xcodeproj \
-            -scheme Seventwos \
-            -configuration Debug \
-            -destination 'generic/platform=iOS Simulator' \
-            -xcconfig "$CODEQL_XCCONFIG" \
-            -derivedDataPath "$DERIVED_DATA" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
-            CLANG_ENABLE_CODE_COVERAGE=NO \
-            ONLY_ACTIVE_ARCH=YES \
-            COMPILATION_CACHE_ENABLE_CACHING=NO \
-            SWIFT_ENABLE_COMPILE_CACHE=NO \
-            SWIFT_USE_INTEGRATED_DRIVER=NO
-          # Keep package products so CodeQL traces only this project's targets.
-          for target in MapLibreInterface MapLibreShim MatrixRustSDKMocks NSE Seventwos ShareExtension; do
-            rm -rf "$DERIVED_DATA/Build/Intermediates.noindex/$target.build"
-          done
-          test -d "$DERIVED_DATA/Build/Intermediates.noindex/swift-collections.build"
-          test ! -e "$DERIVED_DATA/Build/Intermediates.noindex/Seventwos.build"
       - name: Initialize CodeQL
         uses: github/codeql-action/init@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4
         with:
@@ -156,7 +132,6 @@ jobs:
             -destination 'generic/platform=iOS Simulator' \
             -xcconfig "$CODEQL_XCCONFIG" \
             -jobs 1 \
-            -derivedDataPath "$CODEQL_DERIVED_DATA" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
             CLANG_ENABLE_CODE_COVERAGE=NO \
