@@ -129,7 +129,7 @@ enum UITestsSignalling {
             
             let rawMessage = rawMessage(signal)
             try rawMessage.write(to: fileURL, atomically: false, encoding: .utf8)
-            NSLog("UITestsSignalling: Sent \(rawMessage)")
+            NSLog("UITestsSignalling: Sent %@", rawMessage)
         }
         
         /// The signal formatted as a complete message string, including the identifier for this sender.
@@ -192,7 +192,7 @@ enum UITestsSignalling {
             
             signals.send(message.signal)
             
-            NSLog("UITestsSignalling: Received \(rawMessage)")
+            NSLog("UITestsSignalling: Received %@", rawMessage)
         }
     }
 }

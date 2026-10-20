@@ -11,7 +11,7 @@ jobs:
   analyze:
     name: Analyze iOS (Swift)
     runs-on: macos-26-intel
-    timeout-minutes: 180
+    timeout-minutes: 360
     permissions:
       actions: read
       contents: read
@@ -41,6 +41,7 @@ jobs:
           done
       - name: Verify resolved simulator architectures
         run: |
+          python3 -B ci_scripts/codeql_build_settings_test.py
           CODEQL_XCCONFIG="$(mktemp -d "$RUNNER_TEMP/codeql.XXXXXX")/simulator.xcconfig"
           # Conditional build settings must be parsed as xcconfig, not CLI assignments.
           printf '%s\n' 'EXCLUDED_ARCHS[sdk=iphonesimulator*] = arm64' > "$CODEQL_XCCONFIG"
@@ -84,6 +85,25 @@ jobs:
           if "Seventwos" not in simulator_targets:
               sys.exit("Missing resolved simulator settings for the Seventwos app")
           PY
+      - name: Configure serial Swift driver
+        run: |
+          # Xcode appends its CPU-derived -j flag after OTHER_SWIFT_FLAGS.
+          # A custom driver forwards the full invocation and appends the cap last.
+          CODEQL_REAL_SWIFTC="$(xcrun --find swiftc)"
+          CODEQL_SWIFT_EXEC="$RUNNER_TEMP/codeql-swiftc/bin/swiftc"
+          toolchain_usr="$(dirname "$(dirname "$CODEQL_REAL_SWIFTC")")"
+          test -s "$toolchain_usr/share/swift/features.json"
+          mkdir -p "$(dirname "$CODEQL_SWIFT_EXEC")"
+          # Xcode discovers compiler features and host libraries relative to swiftc.
+          ln -s "$toolchain_usr/share" "$RUNNER_TEMP/codeql-swiftc/share"
+          ln -s "$toolchain_usr/lib" "$RUNNER_TEMP/codeql-swiftc/lib"
+          cp ci_scripts/codeql_swiftc.sh "$CODEQL_SWIFT_EXEC"
+          chmod +x "$CODEQL_SWIFT_EXEC"
+          cmp "$toolchain_usr/share/swift/features.json" \
+            "$RUNNER_TEMP/codeql-swiftc/share/swift/features.json"
+          echo "CODEQL_REAL_SWIFTC=$CODEQL_REAL_SWIFTC" >> "$GITHUB_ENV"
+          echo "CODEQL_SWIFT_EXEC=$CODEQL_SWIFT_EXEC" >> "$GITHUB_ENV"
+          CODEQL_REAL_SWIFTC="$CODEQL_REAL_SWIFTC" "$CODEQL_SWIFT_EXEC" --version
       - name: Initialize CodeQL
         uses: github/codeql-action/init@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4
         with:
@@ -105,7 +125,7 @@ jobs:
           monitor_pid=$!
           trap 'kill "$monitor_pid"' EXIT
 
-          CODEQL_ANALYSIS=1 xcodebuild build \
+          CODEQL_ANALYSIS=1 xcodebuild build -showBuildTimingSummary \
             -project Seventwos.xcodeproj \
             -scheme Seventwos \
             -configuration Debug \
@@ -118,6 +138,7 @@ jobs:
             ONLY_ACTIVE_ARCH=YES \
             COMPILATION_CACHE_ENABLE_CACHING=NO \
             SWIFT_ENABLE_COMPILE_CACHE=NO \
-            SWIFT_USE_INTEGRATED_DRIVER=NO
+            SWIFT_USE_INTEGRATED_DRIVER=NO \
+            SWIFT_EXEC="$CODEQL_SWIFT_EXEC"
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4
