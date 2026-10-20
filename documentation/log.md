@@ -1,5 +1,8 @@
 # Update Log
 
+## 2026-10-19
+* **OpenCodeReview enrollment scope**: Clarified that per-repository metadata is inert, does not produce OCR evidence, and requires separate activation authorization. Removed controller-specific implementation claims that this repository cannot independently verify. Cloudflare remains a separate, unimplemented lane.
+
 ## 2026-09-17
 * **Init**: Seed the seventwos-owned documentation/ OKF bundle for this fork.
 
