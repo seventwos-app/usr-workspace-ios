@@ -1,11 +1,7 @@
 name: Graphify Semantic Catch-up
 
 on:
-  schedule:
-    # Runs once daily; retries only files still missing semantic extraction
-    # (Gemini free-tier quota resets daily), so full semantic coverage
-    # converges over a few days without ever exceeding quota.
-    - cron: '17 3 * * *'
+  # Manual catch-up avoids spending runner time when semantic quota is exhausted.
   workflow_dispatch: {}
 
 permissions:
