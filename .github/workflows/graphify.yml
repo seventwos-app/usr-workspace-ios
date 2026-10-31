@@ -35,7 +35,7 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           graphify extract . --backend gemini --max-concurrency 1 || {
-            echo "::warning::Gemini semantic extraction failed (likely quota) - falling back to --code-only so a graph still ships. A scheduled catch-up run will retry semantic extraction daily."
+            echo "::warning::Gemini semantic extraction failed (likely quota) - falling back to --code-only so a graph still ships. The manual catch-up workflow can retry semantic extraction later."
             graphify extract . --code-only --force
           }
 
